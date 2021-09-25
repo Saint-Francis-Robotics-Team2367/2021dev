@@ -16,7 +16,7 @@ Learning wpilib
 
 ### Once fully tested in devUnstable, create pull request to devTest
 
-[Link to instructions] (https://docs.github.com/en/github/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request) or ask Mr. P
+[Link to instructions](https://docs.github.com/en/github/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request) or ask Mr. P
   
 ### Ask someone else to review the code and approve the request
   
