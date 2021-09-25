@@ -1,9 +1,6 @@
 # 2021dev
 Learning wpilib
 
-# 2021dev
-Learning wpilib
-
 ### 1. Branch from devTest to create new features or fix bugs
 
 `git checkout devTest`  
