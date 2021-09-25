@@ -4,7 +4,7 @@ Learning wpilib
 # 2021dev
 Learning wpilib
 
-### Branch from devTest to create new features
+### Branch from devTest to create new features or fix bugs
 
 `git checkout devTest`  
 `git checkout -b feature/my-feature` OR `git checkout -b bugfix/my-bugfix`
