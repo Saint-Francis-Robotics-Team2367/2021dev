@@ -11,7 +11,7 @@ Learning wpilib
  
 ### Merge new feature to devUnstable
   
-`git checkout feature/my-feature`  
+`git checkout devUnstable`  
 `git merge feature/my-feature`
 
 ### Once fully tested in devUnstable, create pull request to devTest
