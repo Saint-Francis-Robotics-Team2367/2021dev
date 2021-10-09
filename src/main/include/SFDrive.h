@@ -9,7 +9,7 @@
 class SFDrive {
  public:
   // member variables
-  const double deadband = 0.08;
+  const double deadband = 0.06;
   rev::CANSparkMax* lMotor = nullptr;
   rev::CANSparkMax* rMotor = nullptr;
 
