@@ -20,36 +20,38 @@ void Robot::RobotInit() {
   m_rightFollowMotor->RestoreFactoryDefaults();
 }
 void Robot::RobotPeriodic() {
-  frc::SmartDashboard::PutNumber("x", stick->GetRawAxis(4));
-  frc::SmartDashboard::PutNumber("y ", -stick->GetRawAxis(1));
+  //frc::SmartDashboard::PutNumber("x", stick->GetRawAxis(4));
+  //frc::SmartDashboard::PutNumber("y ", -stick->GetRawAxis(1));
   frc::SmartDashboard::PutNumber("current velocity", currentVelocity);
   frc::SmartDashboard::PutNumber("current position", currentPosition);
   frc::SmartDashboard::PutNumber("Encoder", m_rightEncoder.GetPosition());
+  frc::SmartDashboard::PutNumber("positionTotal", positionTotal);
   //frc::SmartDashboard::PutNumber("current velocity", currentVelocity);
   //frc::SmartDashboard::PutNumber("current position", currentPosition);
 }
 
 void Robot::AutonomousInit() {
+  
   //wait so if it doesnt show me the rest of the values it gives, its probabl the PID
   //double m_P = 0.05, m_I = 0.05, m_D = 0.1, kMaxOutput = 0.25, kMinOutput = -0.25;
-  double m_P = 0.05, m_I = 0.001, m_D = 0.03, kMaxOutput = 0.25, kMinOutput = -0.25;
+  double m_P = 0.0005, m_I = 0.000, m_D = 0.0, kMaxOutput = 0.25, kMinOutput = -0.25;
+  frc::SmartDashboard::PutNumber("Pd", m_P);
+  
   //or do I set this to 0
   //Set feet here
   m_leftLeadMotor->GetPIDController().SetP(m_P);
   m_leftLeadMotor->GetPIDController().SetI(m_I);
   m_leftLeadMotor->GetPIDController().SetD(m_D);
-  m_leftLeadMotor->GetPIDController().SetOutputRange(kMinOutput, kMaxOutput);
+  //m_leftLeadMotor->GetPIDController().SetOutputRange(kMinOutput, kMaxOutput);
 
   m_rightLeadMotor->GetPIDController().SetP(m_P);
   m_rightLeadMotor->GetPIDController().SetI(m_I);
   m_rightLeadMotor->GetPIDController().SetD(m_D);
-  m_rightLeadMotor->GetPIDController().SetOutputRange(kMinOutput, kMaxOutput);
+  //m_rightLeadMotor->GetPIDController().SetOutputRange(kMinOutput, kMaxOutput);
 
   m_leftEncoder.SetPosition(0);
   m_rightEncoder.SetPosition(0);
-  m_leftEncoder.SetInverted(true);
-  m_rightEncoder.SetInverted(true);
-
+  
   // 15:1 reduction (assumptions), with a 5.7 Diameter wheel
   m_leftEncoder.SetPositionConversionFactor(14/50*(24/40));
   m_rightEncoder.SetPositionConversionFactor(14/50*(24/40));
@@ -57,9 +59,14 @@ void Robot::AutonomousInit() {
   currentPosition = 0;
   currentVelocity = 0;
   positionTotal = frc::SmartDashboard::GetNumber("positionTotal", 6);
-  frc::SmartDashboard::PutNumber("positionTotal", positionTotal);
+  
+  
 }
 void Robot::AutonomousPeriodic() {
+  double m_P = frc::SmartDashboard::GetNumber("Pd", 0.1);
+  m_leftLeadMotor->GetPIDController().SetP(m_P);
+  m_rightLeadMotor->GetPIDController().SetP(m_P);
+  
   //Does this work or is there a substantial delay in the init call
   if(currentPosition < positionTotal) {
     double timeElapsed = frc::Timer::GetFPGATimestamp() - prevTime;
@@ -85,12 +92,13 @@ void Robot::AutonomousPeriodic() {
   currentPosition += currentVelocity * timeElapsed;
 
     //in rotations
-    m_leftLeadMotor->GetPIDController().SetReference(-Robot::convertDistanceToTicks(currentPosition), rev::ControlType::kPosition);
-    m_rightLeadMotor->GetPIDController().SetReference(Robot::convertDistanceToTicks(currentPosition) , rev::ControlType::kPosition);
+    m_leftLeadMotor->GetPIDController().SetReference(0, rev::ControlType::kPosition);
+    m_rightLeadMotor->GetPIDController().SetReference(10 , rev::ControlType::kPosition);
       //I know that it will always go a little above the feetNeeded, Ill fix it later
 
   prevTime = frc::Timer::GetFPGATimestamp();
   }
+  
 }
 
 void Robot::TeleopInit() {}
