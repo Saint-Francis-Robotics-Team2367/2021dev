@@ -51,7 +51,7 @@ void Robot::TeleopPeriodic() {
 
   PSI = (analog_input->GetVoltage()) * 100 + 10; // transfer function
   if (m_stick->GetRawButtonPressed(1)) {
-    valve.Set(false);
+    // valve.Set(false);
     pressed_button_pressure = true;
     reached_max_pressure = false;
     frc::SmartDashboard::PutBoolean("triggerpress", true);
@@ -59,21 +59,21 @@ void Robot::TeleopPeriodic() {
   }
 
   if ((m_stick->GetRawButtonPressed(2)) && (reached_max_pressure)) {
-    valve.Set(true);
+    // valve.Set(true);
     frc::SmartDashboard::PutBoolean("valve", true);
   }
 
   if (m_stick->GetRawButtonPressed(3)) {
-    valve.Set(false);
+    // valve.Set(false);
     frc::SmartDashboard::PutBoolean("valve", false);
   }
 
   if ((!reached_max_pressure) && (pressed_button_pressure)) {
     if (PSI < maxPSI) {
       frc::SmartDashboard::PutNumber("currPSI", PSI);
-      compressor->Set(1);
+      // compressor->Set(1);
     } else {
-      compressor->Set(0);
+      // compressor->Set(0);
       reached_max_pressure = true;
       pressed_button_pressure = false; 
       frc::SmartDashboard::PutBoolean("triggerpress", false);
@@ -89,11 +89,10 @@ void Robot::DisabledPeriodic() {}
 
 void Robot::TestInit() {}
 void Robot::TestPeriodic() {
-  left_y = m_stick->GetRawAxis(1);
-  right_x = m_stick->GetRawAxis(4);
 
-  m_robotDrive->ArcadeDrive(-left_y, right_x);
-
+  m_leftLeadMotor->Set(0.1);
+  m_rightLeadMotor->Set(0.1);
+  // frc::WaitCommand::WaitCommand(30);
 
   speed_leftLead = m_leftLeadMotor->Get();
   frc::SmartDashboard::PutNumber("speed_leftLead", speed_leftLead);

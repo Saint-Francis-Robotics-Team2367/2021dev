@@ -10,6 +10,7 @@
 #include <frc/Spark.h>
 #include "SFDrive.h"
 #include <frc/Solenoid.h>
+#include <frc/commands/WaitCommand.h>
 
 class Robot : public frc::TimedRobot {
  public:
