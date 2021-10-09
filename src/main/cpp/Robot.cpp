@@ -95,3 +95,8 @@ int main() {
   return frc::StartRobot<Robot>();
 }
 #endif
+
+
+void Command::Execute() {
+  frc::SmartDashboard::PutNumber("Ramp Rate", Ramp.GetRampRate());
+}
