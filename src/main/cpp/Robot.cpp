@@ -88,7 +88,40 @@ void Robot::DisabledInit() {}
 void Robot::DisabledPeriodic() {}
 
 void Robot::TestInit() {}
-void Robot::TestPeriodic() {}
+void Robot::TestPeriodic() {
+  left_y = m_stick->GetRawAxis(1);
+  right_x = m_stick->GetRawAxis(4);
+
+  m_robotDrive->ArcadeDrive(-left_y, right_x);
+
+
+  speed_leftLead = m_leftLeadMotor->Get();
+  frc::SmartDashboard::PutNumber("speed_leftLead", speed_leftLead);
+
+  speed_leftFollow = m_leftFollowMotor->Get();
+  frc::SmartDashboard::PutNumber("speed_leftFollow", speed_leftFollow);
+
+  speed_rightLead = m_rightLeadMotor->Get();
+  frc::SmartDashboard::PutNumber("speed_rightLead", speed_rightLead);
+
+  speed_rightFollow = m_rightFollowMotor->Get();
+  frc::SmartDashboard::PutNumber("speed_rightFollow", speed_rightFollow);
+
+  left_inputSpeed = frc::SmartDashboard::GetNumber("left inputSpeed (%)", 50);
+  right_inputSpeed = frc::SmartDashboard::GetNumber("right inputSpeed (%)", 50);
+
+  if (speed_leftLead == speed_leftFollow) {
+    leftMotor_equal = true;
+  }
+
+  if (speed_rightLead == speed_rightFollow) {
+    rightMotor_equal = true;
+  }
+
+  frc::SmartDashboard::PutBoolean("leftMotor_equal", leftMotor_equal);
+  frc::SmartDashboard::PutBoolean("rightMotor_equal", rightMotor_equal);
+
+}
 
 #ifndef RUNNING_FRC_TESTS
 int main() {
