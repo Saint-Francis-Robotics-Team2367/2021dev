@@ -10,13 +10,15 @@ class SFDrive {
  public:
   // member variables
   const double deadband = 0.08;
-  rev::CANSparkMax* lMotor = nullptr;
-  rev::CANSparkMax* rMotor = nullptr;
+  rev::CANSparkMax* leftLeadMotor = nullptr;
+  rev::CANSparkMax* rightLeadMotor = nullptr;
+  rev::CANSparkMax* leftFollowMotor = nullptr;
+  rev::CANSparkMax* rightFollowMotor = nullptr;
 
   // constructor
-  SFDrive(rev::CANSparkMax* lMotor, rev::CANSparkMax* rMotor);
+  SFDrive(rev::CANSparkMax* leftLeadMotor, rev::CANSparkMax* rightLeadMotor, rev::CANSparkMax* leftFollowMotor, rev::CANSparkMax* rightFollowMotor);
   
  public:
   // methods
-  void ArcadeDrive(double xSpeed, double zRotation);
+  void ArcadeDrive(double joystickX, double joystickY);
 };
