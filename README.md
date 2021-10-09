@@ -4,9 +4,13 @@ Learning wpilib
 ### 1. Branch from devTest to create new features or fix bugs
 
 `git checkout devTest`  
-`git checkout -b feature/my-feature` OR `git checkout -b bugfix/my-bugfix`
+
+`git checkout -b feature/my-feature OR git checkout -b bugfix/my-bugfix`
+
 `git add .`
+
 `git commit -m "m"`
+
 `git push -u origin feature/my-feature` 
 
 ### 2. Merge new feature to devUnstable
