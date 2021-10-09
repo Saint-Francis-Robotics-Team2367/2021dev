@@ -11,6 +11,7 @@
 #include "SFDrive.h"
 #include <frc/Solenoid.h>
 #include <frc/commands/WaitCommand.h>
+#include <unistd.h>
 
 class Robot : public frc::TimedRobot {
  public:
@@ -29,9 +30,9 @@ class Robot : public frc::TimedRobot {
   void TestInit() override;
   void TestPeriodic() override;
 
-  static const int leftLeadDeviceID = 12; // 12
+  static const int leftLeadDeviceID = 12; // 12 // 3 for 8109
   static const int leftFollowDeviceID = 13;
-  static const int rightLeadDeviceID = 15; // 15
+  static const int rightLeadDeviceID = 15; // 15 // 12 for 8109
   static const int rightFollowDeviceID = 14;
 
   double left_y = 0.0;

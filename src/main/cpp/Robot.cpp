@@ -92,8 +92,8 @@ void Robot::TestPeriodic() {
 
   m_leftLeadMotor->Set(0.1);
   m_rightLeadMotor->Set(0.1);
-  // frc::WaitCommand::WaitCommand(30);
-
+  sleep(30);
+  
   speed_leftLead = m_leftLeadMotor->Get();
   frc::SmartDashboard::PutNumber("speed_leftLead", speed_leftLead);
 
