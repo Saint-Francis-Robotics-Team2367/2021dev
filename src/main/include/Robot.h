@@ -29,6 +29,7 @@ class Robot : public frc::TimedRobot {
   void TestPeriodic() override;
 
   int testRampRate = 100;
+  frc::AnalogInput rampInput(1);
 
   static const int leftLeadDeviceID = 12; // 12
   static const int leftFollowDeviceID = 13;

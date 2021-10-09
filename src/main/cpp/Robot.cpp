@@ -33,9 +33,12 @@ void Robot::TeleopInit() {
   compressor = new frc::Spark(1);
   pressed_button_pressure = true;
   valve.Set(false);
+  rampInput = new frc::AnalogInput(0);
 }
 void Robot::TeleopPeriodic() {
  frc::SmartDashboard::PutNumber("Ramp Rate", testRampRate);
+
+ 
   left_y = m_stick->GetRawAxis(1);
   right_x = m_stick->GetRawAxis(4);
 
@@ -43,6 +46,8 @@ void Robot::TeleopPeriodic() {
 
   analog_input->GetVoltage();
   frc::SmartDashboard::PutNumber("analogInput", analog_input->GetVoltage());
+  float myNumber = frc::SmartDashboard::GetNumber("myInput", 0);
+  
 
   var_input = frc::SmartDashboard::GetNumber("varInput", 1);
   frc::SmartDashboard::PutNumber("varInput", var_input);
