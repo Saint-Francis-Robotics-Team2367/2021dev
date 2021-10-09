@@ -34,11 +34,12 @@ void Robot::TeleopInit() {
   pressed_button_pressure = true;
   valve.Set(false);
   rampInput = new frc::AnalogInput(0);
+  frc::SmartDashboard::PutNumber("Updated Ramp Rate", 1.0);
 }
 void Robot::TeleopPeriodic() {
  frc::SmartDashboard::PutNumber("Ramp Rate", testRampRate);
- float myNumber = frc::SmartDashboard::GetNumber("myInput", 0);
- frc::SmartDashboard::PutNumber("Updated Ramp Rate", myNumber);
+ float myNumber = frc::SmartDashboard::GetNumber("Updated Ramp Rate", 0);
+ frc::SmartDashboard::PutNumber("Saved Updated Ramp Rate", myNumber);
  
   left_y = m_stick->GetRawAxis(1);
   right_x = m_stick->GetRawAxis(4);
