@@ -37,7 +37,8 @@ void Robot::TeleopInit() {
 }
 void Robot::TeleopPeriodic() {
  frc::SmartDashboard::PutNumber("Ramp Rate", testRampRate);
-
+ float myNumber = frc::SmartDashboard::GetNumber("myInput", 0);
+ frc::SmartDashboard::PutNumber("Updated Ramp Rate", myNumber);
  
   left_y = m_stick->GetRawAxis(1);
   right_x = m_stick->GetRawAxis(4);
@@ -46,8 +47,8 @@ void Robot::TeleopPeriodic() {
 
   analog_input->GetVoltage();
   frc::SmartDashboard::PutNumber("analogInput", analog_input->GetVoltage());
-  float myNumber = frc::SmartDashboard::GetNumber("myInput", 0);
   
+
 
   var_input = frc::SmartDashboard::GetNumber("varInput", 1);
   frc::SmartDashboard::PutNumber("varInput", var_input);
@@ -74,7 +75,7 @@ void Robot::TeleopPeriodic() {
     frc::SmartDashboard::PutBoolean("valve", false);
   }
 
-  if ((!reached_max_pressure) && (pressed_button_pressure)) {
+  /*if ((!reached_max_pressure) && (pressed_button_pressure)) {
     if (PSI < maxPSI) {
       frc::SmartDashboard::PutNumber("currPSI", PSI);
       compressor->Set(1);
@@ -84,7 +85,7 @@ void Robot::TeleopPeriodic() {
       pressed_button_pressure = false; 
       frc::SmartDashboard::PutBoolean("triggerpress", false);
     }
-  }
+  }*/
   
   // if button pressed,
   // include if statement
