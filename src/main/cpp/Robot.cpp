@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "Robot.h"
+#include "threadContainer.h"
 #include <frc/smartdashboard/SmartDashboard.h>
 
 void Robot::RobotInit() {
@@ -18,6 +19,12 @@ void Robot::RobotInit() {
   m_leftFollowMotor->Follow(*m_leftLeadMotor, false);
   m_rightLeadMotor->SetInverted(false);
   m_rightFollowMotor->Follow(*m_rightLeadMotor, false);
+
+  pthread_t newThread; 
+
+  pthread_create(&newThread, NULL, hello, NULL);
+
+  
 }
 void Robot::RobotPeriodic() {
   frc::SmartDashboard::PutNumber("left y: ", -(m_stick->GetRawAxis(1)));
