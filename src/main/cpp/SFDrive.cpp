@@ -4,37 +4,58 @@
 
 #include "SFDrive.h"
 #include <math.h>
+//Maybe smart dashboard if I want, could gobal variable, h file thing too if I want (figure out)
 
-SFDrive::SFDrive(rev::CANSparkMax* lMotor, rev::CANSparkMax* rMotor) : lMotor{lMotor}, rMotor{rMotor} {}
 
-void SFDrive::ArcadeDrive(double xSpeed, double zRotation) 
-{
-    double leftMotorOutput, rightMotorOutput;
+//Review class construction*
+SFDrive::SFDrive(rev::CANSparkMax* leftLeadMotor, rev::CANSparkMax* rightLeadMotor, 
+    rev::CANSparkMax* leftFollowMotor, rev::CANSparkMax* rightFollowMotor) : leftLeadMotor{leftLeadMotor}, rightLeadMotor{rightLeadMotor},
+    leftFollowMotor{leftFollowMotor}, rightFollowMotor{rightFollowMotor} {}
 
-    if (fabs(xSpeed) < deadband)
-        xSpeed = 0;
 
-    if (fabs(zRotation) < deadband)
-        zRotation = 0;
+void SFDrive::ArcadeDrive(double joystickX, double joystickY) {
+  double afterLeftDeadband;
+  double afterRightDeadband;
+  double leftMotorOutput;
+  double rightMotorOutput;
 
-    if (xSpeed >= 0.0) {
-        leftMotorOutput = xSpeed + zRotation;
-        rightMotorOutput = xSpeed - zRotation;
-    }
-    else {
-        leftMotorOutput = xSpeed - zRotation;
-        rightMotorOutput = xSpeed + zRotation;
-    }
 
-    if (leftMotorOutput != 0)
-        leftMotorOutput = std::copysign((1/(1-deadband)) * fabs(leftMotorOutput) - (deadband/(1/deadband)), leftMotorOutput);
-        
-    if (rightMotorOutput != 0)
-        rightMotorOutput = std::copysign((1/(1-deadband)) * fabs(rightMotorOutput) - (deadband/(1/deadband)), rightMotorOutput);
+  if (fabs(joystickX) <= deadband)
+    joystickX = 0;
+  if (fabs(joystickY) <= deadband)
+    joystickY = 0;
+  
+  double leftAbs = std::fabs(joystickX);
+  double rightAbs = std::fabs(joystickY);
+  
+  // scaling
 
-    leftMotorOutput = std::copysign(pow(leftMotorOutput, 2), leftMotorOutput);
-    rightMotorOutput = std::copysign(pow(rightMotorOutput, 2), rightMotorOutput);
+  //reason for the if statements is that if leftAbs is 0 when its under deadband, the input becomes negative, so it fixes it
+  if (leftAbs != 0)
+    afterLeftDeadband = (1/(1-deadband)) * leftAbs - (deadband/(1/deadband));
+  else
+    afterLeftDeadband = 0;
 
-    lMotor->Set(leftMotorOutput);
-    rMotor->Set(rightMotorOutput);
+  if (rightAbs != 0)
+    afterRightDeadband = (1/(1-deadband)) * rightAbs - (deadband/(1/deadband));
+  else
+    afterRightDeadband = 0;
+  
+  joystickX = std::copysign(pow(afterLeftDeadband, 2), joystickX);
+  joystickY = std::copysign(pow(afterRightDeadband, 2), joystickY);
+
+  //To fix turning backwards
+  if (joystickY >= 0.0) {
+    leftMotorOutput = joystickY + joystickX;
+    rightMotorOutput = joystickY - joystickX;
+  }
+  else {
+    leftMotorOutput = joystickY - joystickX;
+    rightMotorOutput = joystickY + joystickX;
+  }
+
+
+  leftLeadMotor->Set(-leftMotorOutput);
+  //negate here
+  rightLeadMotor->Set(rightMotorOutput);
 }
