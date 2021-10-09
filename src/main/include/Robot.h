@@ -28,6 +28,8 @@ class Robot : public frc::TimedRobot {
   void TestInit() override;
   void TestPeriodic() override;
 
+  int testRampRate = 100;
+
   static const int leftLeadDeviceID = 12; // 12
   static const int leftFollowDeviceID = 13;
   static const int rightLeadDeviceID = 15; // 15

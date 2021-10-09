@@ -35,6 +35,7 @@ void Robot::TeleopInit() {
   valve.Set(false);
 }
 void Robot::TeleopPeriodic() {
+ frc::SmartDashboard::PutNumber("Ramp Rate", testRampRate);
   left_y = m_stick->GetRawAxis(1);
   right_x = m_stick->GetRawAxis(4);
 
@@ -96,7 +97,3 @@ int main() {
 }
 #endif
 
-
-void Command::Execute() {
-  frc::SmartDashboard::PutNumber("Ramp Rate", Ramp.GetRampRate());
-}
