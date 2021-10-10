@@ -65,14 +65,15 @@ class Robot : public frc::TimedRobot {
 
 //actually revolutions
 double Robot::convertDistanceToTicks(double feet) {
+  //inches / (3.14 * 5.7) * 42 * ((14/50) * (24/40))
   double inches = feet * 12;
   double diameter = 5.7;
   double ticksPerRevolution = 42;
   double wheelCircumference = M_PI*diameter;
-  // return (inches/wheelCircumference) * ticksPerRevolution;
-  //fix
-  //gearbox ratio
-  return inches*wheelCircumference/(14/50*(24/40));
+  double gearRatio = (14/50)*(24/40);
+  // return inches*wheelCircumference/(14/50*(24/40));
+  // multiply or divide by gear ratio?
+  return inches/wheelCircumference * ticksPerRevolution * gearRatio;
 }
 
 
