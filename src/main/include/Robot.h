@@ -69,8 +69,8 @@ double Robot::convertDistanceToTicks(double feet) {
   double inches = feet * 12;
   double diameter = 5.7;
   double ticksPerRevolution = 42;
-  double wheelCircumference = M_PI*diameter;
-  double gearRatio = (14/50)*(24/40);
+  double wheelCircumference = 3.14*diameter;
+  double gearRatio = 0.168;
   // return inches*wheelCircumference/(14/50*(24/40));
   // multiply or divide by gear ratio?
   return inches/wheelCircumference * ticksPerRevolution * gearRatio;
