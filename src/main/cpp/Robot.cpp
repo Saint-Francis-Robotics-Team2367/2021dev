@@ -40,7 +40,6 @@ void Robot::AutonomousInit()
   //m_P can start at 0.0005, but then is changed in periodic
   double m_P = 0.05, m_I = 0.000, m_D = 0.0, kMaxOutput = 0.25, kMinOutput = -0.25;
   frc::SmartDashboard::PutNumber("Pd", m_P);
-  frc::SmartDashboard::PutNumber("Total Position", 6);
 
   //or do I set this to 0
   //Set feet here
@@ -67,10 +66,21 @@ void Robot::AutonomousInit()
 void Robot::AutonomousPeriodic() {
   //Making it so you can manually set m_p and positionTotal: m_p is essential with PID, change by an order of magnitude to start run
   double m_P = frc::SmartDashboard::GetNumber("Pd", 0.1);
-  positionTotal = frc::SmartDashboard::GetNumber("Total Positon", 20);
+  bool isNegative;
   m_leftLeadMotor->GetPIDController().SetP(m_P);
   m_rightLeadMotor->GetPIDController().SetP(m_P);
 
+  positionTotal = frc::SmartDashboard::GetNumber("positionTotal", 6);
+  frc::SmartDashboard::PutNumber("positionTotal", positionTotal);
+
+  //So the robot can move backwards in auto, if it ever needs too
+  if (positionTotal < 0) {
+    isNegative = true;
+    positionTotal = fabs(positionTotal);
+    frc::SmartDashboard::PutBoolean("isNegative", true);
+  }
+
+  //if positionTotal was negative, this statement would never be true, and robot couldn't drive backwards 0 < -6ß
   if (currentPosition < positionTotal) {
     double timeElapsed = frc::Timer::GetFPGATimestamp() - prevTime;
 
@@ -88,21 +98,24 @@ void Robot::AutonomousPeriodic() {
         currentVelocity = maxVelocity;
       }
     }
+    //or setpoint
     currentPosition += currentVelocity * timeElapsed;
+    if(currentPosition > positionTotal) {
+      currentPosition = positionTotal;
+    }
     
-    //convert to rots
-    frc::SmartDashboard::PutNumber("currPos", currentPosition);
-    //frc::SmartDashboard::PutNumber("convertedToRotsPoint", Robot::convertDistanceToTicks(currentPosition));
-    //double inRots = (currentPosition*12) / (3.14 * 5.7) * 42 * ((14/50) * (24/40));
-    double inches = currentPosition * 12;
-    frc::SmartDashboard::PutNumber("inInches", inches);
     //0.168 is gear ratio
-    double dividebyDia = inches / (3.14 * 5.7) * 42 * (0.168);
-    frc::SmartDashboard::PutNumber("Divide By Dia", dividebyDia);
-    //frc::SmartDashboard::PutNumber("inRots", inRots);
-    double inRots = dividebyDia;
-    m_leftLeadMotor->GetPIDController().SetReference(inRots, rev::ControlType::kPosition);
-    m_rightLeadMotor->GetPIDController().SetReference(inRots, rev::ControlType::kPosition);
+    double inRots = (currentPosition * 12) / (3.14 * 5.7) * 42 * (0.168);
+    frc::SmartDashboard::PutNumber("convertedToRotsPoint", inRots);
+    //so it goes in the right direction
+    if(isNegative) {
+      m_leftLeadMotor->GetPIDController().SetReference(-inRots, rev::ControlType::kPosition);
+      m_rightLeadMotor->GetPIDController().SetReference(inRots, rev::ControlType::kPosition);
+    } else {
+      m_leftLeadMotor->GetPIDController().SetReference(inRots, rev::ControlType::kPosition);
+      m_rightLeadMotor->GetPIDController().SetReference(-inRots, rev::ControlType::kPosition);
+    }
+    
 
     prevTime = frc::Timer::GetFPGATimestamp();
   }
