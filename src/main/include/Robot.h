@@ -30,7 +30,7 @@ class Robot : public frc::TimedRobot {
   void TestInit() override;
   void TestPeriodic() override;
 
-  static const int leftLeadDeviceID = 12; // 12 // 3 for 8109
+  static const int leftLeadDeviceID = 12; // 15 for 2367 // 3 for 8109
   static const int leftFollowDeviceID = 13;
   static const int rightLeadDeviceID = 15; // 15 // 12 for 8109
   static const int rightFollowDeviceID = 14;
@@ -49,8 +49,8 @@ class Robot : public frc::TimedRobot {
   float speed_rightLead;
   float speed_rightFollow;
 
-  int left_inputSpeed;
-  int right_inputSpeed;
+  float left_inputSpeed;
+  float right_inputSpeed;
 
   bool leftMotor_equal;
   bool rightMotor_equal;

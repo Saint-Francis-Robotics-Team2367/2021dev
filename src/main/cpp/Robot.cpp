@@ -90,10 +90,14 @@ void Robot::DisabledPeriodic() {}
 void Robot::TestInit() {}
 void Robot::TestPeriodic() {
 
-  m_leftLeadMotor->Set(0.1);
-  m_rightLeadMotor->Set(0.1);
-  sleep(30);
+  left_inputSpeed = frc::SmartDashboard::GetNumber("setLeftMotor", 0);
+  right_inputSpeed = frc::SmartDashboard::GetNumber("setRightMotor", 0);
+
+  m_leftLeadMotor->Set(left_inputSpeed);
+  m_rightLeadMotor->Set(right_inputSpeed);
   
+  sleep(10);
+
   speed_leftLead = m_leftLeadMotor->Get();
   frc::SmartDashboard::PutNumber("speed_leftLead", speed_leftLead);
 
@@ -105,9 +109,6 @@ void Robot::TestPeriodic() {
 
   speed_rightFollow = m_rightFollowMotor->Get();
   frc::SmartDashboard::PutNumber("speed_rightFollow", speed_rightFollow);
-
-  left_inputSpeed = frc::SmartDashboard::GetNumber("left inputSpeed (%)", 50);
-  right_inputSpeed = frc::SmartDashboard::GetNumber("right inputSpeed (%)", 50);
 
   if (speed_leftLead == speed_leftFollow) {
     leftMotor_equal = true;
