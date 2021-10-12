@@ -31,9 +31,9 @@ class Robot : public frc::TimedRobot {
   void TestPeriodic() override;
 
   static const int leftLeadDeviceID = 12; // 15 for 2367 // 3 for 8109
-  static const int leftFollowDeviceID = 13;
-  static const int rightLeadDeviceID = 15; // 15 // 12 for 8109
-  static const int rightFollowDeviceID = 14;
+  static const int leftFollowDeviceID = 13; // 14
+  static const int rightLeadDeviceID = 15; // 12 // 12 for 8109
+  static const int rightFollowDeviceID = 14; // 13
 
   double left_y = 0.0;
   double right_x = 0.0;
