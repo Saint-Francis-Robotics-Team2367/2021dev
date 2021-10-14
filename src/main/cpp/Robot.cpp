@@ -5,6 +5,9 @@
 #include "Robot.h"
 #include <frc/smartdashboard/SmartDashboard.h>
 
+using namespace std; 
+using std::filesystem::exists;
+
 void Robot::RobotInit() {
   m_leftLeadMotor->RestoreFactoryDefaults();
   m_rightLeadMotor->RestoreFactoryDefaults();
@@ -87,7 +90,16 @@ void Robot::TeleopPeriodic() {
 void Robot::DisabledInit() {}
 void Robot::DisabledPeriodic() {}
 
-void Robot::TestInit() {}
+void Robot::TestInit() {
+  const string filename = "data.txt";
+  if (exists(filename)) {
+    ofstream myfile(filename);
+  } else {
+    ofstream myfile;
+  }
+  myfile.open(filename);
+
+}
 void Robot::TestPeriodic() {
 
   left_inputSpeed = frc::SmartDashboard::GetNumber("setLeft", 0);
@@ -123,6 +135,12 @@ void Robot::TestPeriodic() {
 
   frc::SmartDashboard::PutBoolean("leftMotor_equal", leftMotor_equal);
   frc::SmartDashboard::PutBoolean("rightMotor_equal", rightMotor_equal);
+
+  count++;
+
+  myfile << "count: " << count << endl;
+  myfile << "setLeft: " << setLeft << endl;
+  myfile << "setRight: " << setRight << endl;
 
 }
 

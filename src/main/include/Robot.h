@@ -12,6 +12,9 @@
 #include <frc/Solenoid.h>
 #include <frc/commands/WaitCommand.h>
 #include <unistd.h>
+#include <iostream>
+#include <fstream>
+#include <filesystem>
 
 class Robot : public frc::TimedRobot {
  public:
@@ -55,6 +58,7 @@ class Robot : public frc::TimedRobot {
   bool leftMotor_equal;
   bool rightMotor_equal;
 
+  int count = 0;
 
   frc::AnalogInput * analog_input = new frc::AnalogInput(1);
 
