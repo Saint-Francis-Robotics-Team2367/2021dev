@@ -6,18 +6,18 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 
 void Robot::RobotInit() {
-  m_leftLeadMotor->RestoreFactoryDefaults();
+  // m_leftLeadMotor->RestoreFactoryDefaults();
   m_rightLeadMotor->RestoreFactoryDefaults();
-  m_leftFollowMotor->RestoreFactoryDefaults();
-  m_rightFollowMotor->RestoreFactoryDefaults();
+  // m_leftFollowMotor->RestoreFactoryDefaults();
+  // m_rightFollowMotor->RestoreFactoryDefaults();
 
-  m_leftEncoder.SetPosition(0);
+  // m_leftEncoder.SetPosition(0);
   m_rightEncoder.SetPosition(0);
 
-  m_leftLeadMotor->SetInverted(true);
-  m_leftFollowMotor->Follow(*m_leftLeadMotor, false);
+  // m_leftLeadMotor->SetInverted(true);
+  // m_leftFollowMotor->Follow(*m_leftLeadMotor, false);
   m_rightLeadMotor->SetInverted(false);
-  m_rightFollowMotor->Follow(*m_rightLeadMotor, false);
+  // m_rightFollowMotor->Follow(*m_rightLeadMotor, false);
 }
 void Robot::RobotPeriodic() {
   frc::SmartDashboard::PutNumber("left y: ", -(m_stick->GetRawAxis(1)));
@@ -28,7 +28,8 @@ void Robot::AutonomousInit() {}
 void Robot::AutonomousPeriodic() {}
 
 void Robot::TeleopInit() {
-  m_leftEncoder.SetPosition(0);
+  frc::Solenoid valve{0};
+  // m_leftEncoder.SetPosition(0);
   m_rightEncoder.SetPosition(0);
   compressor = new frc::Spark(1);
   pressed_button_pressure = true;
@@ -38,7 +39,7 @@ void Robot::TeleopPeriodic() {
   left_y = m_stick->GetRawAxis(1);
   right_x = m_stick->GetRawAxis(4);
 
-  m_robotDrive->ArcadeDrive(-left_y, right_x);
+  // m_robotDrive->ArcadeDrive(-left_y, right_x);
 
   analog_input->GetVoltage();
   frc::SmartDashboard::PutNumber("analogInput", analog_input->GetVoltage());
@@ -88,38 +89,40 @@ void Robot::DisabledInit() {}
 void Robot::DisabledPeriodic() {}
 
 void Robot::TestInit() {
-  std::string filename = "data.txt";
-  if (std::filesystem::exists(filename)) {
+  /* if (std::filesystem::exists(filename)) {
     ofstream myfile(filename);
   } else {
     ofstream myfile;
   }
-  myfile.open(filename);
+  myfile.open(filename); */
 
+  std::ofstream motorData;
+
+ 
 }
 void Robot::TestPeriodic() {
-
+  
   left_inputSpeed = frc::SmartDashboard::GetNumber("setLeft", 0);
   right_inputSpeed = frc::SmartDashboard::GetNumber("setRight", 0);
 
   frc::SmartDashboard::PutNumber("setLeft", left_inputSpeed);
   frc::SmartDashboard::PutNumber("setRight", right_inputSpeed);
 
-  m_leftLeadMotor->Set(left_inputSpeed);
+  // m_leftLeadMotor->Set(left_inputSpeed);
   m_rightLeadMotor->Set(right_inputSpeed);
   
    // sleep(10);
 
-  speed_leftLead = m_leftLeadMotor->Get();
+  // speed_leftLead = m_leftLeadMotor->Get();
   frc::SmartDashboard::PutNumber("speed_leftLead", speed_leftLead);
 
-  speed_leftFollow = m_leftFollowMotor->Get();
+  // speed_leftFollow = m_leftFollowMotor->Get();
   frc::SmartDashboard::PutNumber("speed_leftFollow", speed_leftFollow);
 
   speed_rightLead = m_rightLeadMotor->Get();
   frc::SmartDashboard::PutNumber("speed_rightLead", speed_rightLead);
 
-  speed_rightFollow = m_rightFollowMotor->Get();
+  // speed_rightFollow = m_rightFollowMotor->Get();
   frc::SmartDashboard::PutNumber("speed_rightFollow", speed_rightFollow);
 
   if (speed_leftLead == speed_leftFollow) {
@@ -135,9 +138,24 @@ void Robot::TestPeriodic() {
 
   count++;
 
-  myfile << "count: " << count << std::endl;
-  myfile << "setLeft: " << setLeft << std::endl;
-  myfile << "setRight: " << setRight << std::endl;
+  motorData.open(filename.c_str());
+
+  
+  if (!motorData.is_open()) {
+    std::cout << "it is open" << std::endl;
+
+    motorData << "count: " << count << std::endl;
+    motorData << "setLeft: " << left_inputSpeed << std::endl;
+    motorData << "setRight: " << right_inputSpeed << std::endl;
+    motorData << "speedRight: " << speed_leftLead << std::endl;
+    motorData << "speedLeft: " << speed_rightLead << std::endl;
+    motorData.close();
+
+  } else {
+    std::cout << "not working" << std::endl;
+  }
+  
+
 
 }
 
