@@ -14,7 +14,6 @@
 #include <unistd.h>
 #include <iostream>
 #include <fstream>
-#include <filesystem>
 
 class Robot : public frc::TimedRobot {
  public:

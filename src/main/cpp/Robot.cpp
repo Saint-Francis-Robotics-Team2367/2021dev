@@ -5,9 +5,6 @@
 #include "Robot.h"
 #include <frc/smartdashboard/SmartDashboard.h>
 
-using namespace std; 
-using std::filesystem::exists;
-
 void Robot::RobotInit() {
   m_leftLeadMotor->RestoreFactoryDefaults();
   m_rightLeadMotor->RestoreFactoryDefaults();
@@ -91,8 +88,8 @@ void Robot::DisabledInit() {}
 void Robot::DisabledPeriodic() {}
 
 void Robot::TestInit() {
-  const string filename = "data.txt";
-  if (exists(filename)) {
+  std::string filename = "data.txt";
+  if (std::filesystem::exists(filename)) {
     ofstream myfile(filename);
   } else {
     ofstream myfile;
@@ -138,9 +135,9 @@ void Robot::TestPeriodic() {
 
   count++;
 
-  myfile << "count: " << count << endl;
-  myfile << "setLeft: " << setLeft << endl;
-  myfile << "setRight: " << setRight << endl;
+  myfile << "count: " << count << std::endl;
+  myfile << "setLeft: " << setLeft << std::endl;
+  myfile << "setRight: " << setRight << std::endl;
 
 }
 
