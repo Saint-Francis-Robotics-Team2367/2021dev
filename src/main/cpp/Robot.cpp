@@ -96,8 +96,8 @@ void Robot::TestInit() {
   }
   myfile.open(filename); */
 
-  std::ofstream motorData;
-
+  // std::ofstream motorData;
+  fp = fopen(filename.c_str(), "w+");
  
 }
 void Robot::TestPeriodic() {
@@ -138,10 +138,18 @@ void Robot::TestPeriodic() {
 
   count++;
 
-  motorData.open(filename.c_str());
+  std::cout << "filename: " << filename << std::endl;
+  // motorData.open(filename);
+  if (fp) {
+    std::cout << "works" << std::endl;
+    fputs("hello", fp);
+  } else {
+    std::cout << "fails" << std::endl;
+  }
+
 
   
-  if (!motorData.is_open()) {
+  /*if (motorData) {
     std::cout << "it is open" << std::endl;
 
     motorData << "count: " << count << std::endl;
@@ -152,8 +160,8 @@ void Robot::TestPeriodic() {
     motorData.close();
 
   } else {
-    std::cout << "not working" << std::endl;
-  }
+    std::cout << "file not found" << std::endl;
+  }*/
   
 
 

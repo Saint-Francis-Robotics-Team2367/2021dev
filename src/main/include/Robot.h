@@ -14,6 +14,7 @@
 #include <unistd.h>
 #include <iostream>
 #include <fstream>
+#include <stdio.h>
 
 class Robot : public frc::TimedRobot {
  public:
@@ -58,9 +59,12 @@ class Robot : public frc::TimedRobot {
   bool rightMotor_equal;
 
   int count = 0;
+  FILE *fp;
 
-  std::string filename = "C:\\Users\\LancerRobotics\\2021dev\\src\\main\\cpp\\data.csv";
+  // std::string filename = "..\\2021dev\\src\\main\\cpp\\data.txt";
+  std::string filename = "/home/lvuser/data.txt";
 
+  
 
   frc::AnalogInput * analog_input = new frc::AnalogInput(1);
 
