@@ -32,7 +32,12 @@ void Robot::TeleopInit() {
   m_rightEncoder.SetPosition(0);
   compressor = new frc::Spark(1);
   pressed_button_pressure = true;
+  
   valve.Set(false);
+  v_shutoffTimerFlag = false;
+  v_shutoffTimer->Reset();
+
+  v_shutoffDelay = -1; // -1 is default behavior, non zero value is delayed shutoff in seconds
 }
 void Robot::TeleopPeriodic() {
   left_y = m_stick->GetRawAxis(1);
@@ -49,6 +54,9 @@ void Robot::TeleopPeriodic() {
   maxPSI = frc::SmartDashboard::GetNumber("maxPSI", 82);
   frc::SmartDashboard::PutNumber("maxPSI", maxPSI);
 
+  v_shutoffDelay = frc::SmartDashboard::GetNumber("valveDelay", 0.75);
+  frc::SmartDashboard::PutNumber("valveDelay", v_shutoffDelay);
+
   PSI = (analog_input->GetVoltage()) * 100 + 10; // transfer function
   if (m_stick->GetRawButtonPressed(1)) {
     valve.Set(false);
@@ -61,6 +69,21 @@ void Robot::TeleopPeriodic() {
   if ((m_stick->GetRawButtonPressed(2)) && (reached_max_pressure)) {
     valve.Set(true);
     frc::SmartDashboard::PutBoolean("valve", true);
+
+    if (v_shutoffDelay > 0) {
+      if (v_shutoffTimerFlag == false) {
+        // set timer
+        v_shutoffTimer->Reset();
+        v_shutoffTimer->Start();
+        v_shutoffTimerFlag == true;
+      } else {
+        if (v_shutoffTimer->Get() >= v_shutoffDelay) {
+          valve.Set(false); 
+          v_shutoffTimerFlag = false;
+          v_shutoffTimer->Stop();
+        }
+      }
+    }
   }
 
   if (m_stick->GetRawButtonPressed(3)) {
