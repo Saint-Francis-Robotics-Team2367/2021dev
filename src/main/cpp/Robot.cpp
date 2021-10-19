@@ -167,9 +167,6 @@ void Robot::TestPeriodic() {
     }
   }
   
-  
-
-
 }
 
 #ifndef RUNNING_FRC_TESTS
