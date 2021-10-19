@@ -58,13 +58,9 @@ class Robot : public frc::TimedRobot {
   bool leftMotor_equal;
   bool rightMotor_equal;
 
-  int count = 0;
-  FILE *fp;
+  int count;
 
-  // std::string filename = "..\\2021dev\\src\\main\\cpp\\data.txt";
-  std::string filename = "/home/lvuser/data.txt";
-
-  
+  std::string filename = "/home/lvuser/logdata.csv";
 
   frc::AnalogInput * analog_input = new frc::AnalogInput(1);
 

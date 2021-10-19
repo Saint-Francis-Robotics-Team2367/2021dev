@@ -89,16 +89,21 @@ void Robot::DisabledInit() {}
 void Robot::DisabledPeriodic() {}
 
 void Robot::TestInit() {
-  /* if (std::filesystem::exists(filename)) {
-    ofstream myfile(filename);
-  } else {
-    ofstream myfile;
-  }
-  myfile.open(filename); */
+  
+  count = 0;
 
-  // std::ofstream motorData;
-  fp = fopen(filename.c_str(), "w+");
- 
+  std::cout << "Robot::TestInit filename: " << filename << std::endl;
+  motorData.open(filename);
+  
+  if (motorData) {
+    motorData << "count,left_input_speed,right_input_speed,speed_left_lead,speed_left_follow,speed_right_lead,speed_right_follow,left_motor_equal,right_motor_equal" << std::endl;
+    std::cout << "Robot::TestInit: wrote headers in file" << std::endl;
+    
+    motorData.close();
+  } else {
+    std::cout << "Robot::TestInit: unable to open file " << filename << std::endl;
+  }
+
 }
 void Robot::TestPeriodic() {
   
@@ -110,7 +115,7 @@ void Robot::TestPeriodic() {
 
   // m_leftLeadMotor->Set(left_inputSpeed);
   m_rightLeadMotor->Set(right_inputSpeed);
-  
+
    // sleep(10);
 
   // speed_leftLead = m_leftLeadMotor->Get();
@@ -137,31 +142,31 @@ void Robot::TestPeriodic() {
   frc::SmartDashboard::PutBoolean("rightMotor_equal", rightMotor_equal);
 
   count++;
-
-  std::cout << "filename: " << filename << std::endl;
-  // motorData.open(filename);
-  if (fp) {
-    std::cout << "works" << std::endl;
-    fputs("hello", fp);
-  } else {
-    std::cout << "fails" << std::endl;
-  }
-
-
   
-  /*if (motorData) {
-    std::cout << "it is open" << std::endl;
+  if (count % 50 == 0) {
+    motorData.open(filename, std::ios::app); // open with append
+  
+    if (motorData) {
+      std::cout << "Robot::TestPeriodic [" << count << "] logging motor values to file" << std::endl;
+    
+      motorData << count << ",";
+      motorData << left_inputSpeed << ",";
+      motorData << right_inputSpeed << ",";
+      motorData << speed_leftLead << ",";
+      motorData << speed_leftFollow << ",";
+      motorData << speed_rightLead << ",";
+      motorData << speed_rightFollow << ",";
+      motorData << leftMotor_equal << ",";
+      motorData << rightMotor_equal << std::endl;
+    
+      motorData.close();
 
-    motorData << "count: " << count << std::endl;
-    motorData << "setLeft: " << left_inputSpeed << std::endl;
-    motorData << "setRight: " << right_inputSpeed << std::endl;
-    motorData << "speedRight: " << speed_leftLead << std::endl;
-    motorData << "speedLeft: " << speed_rightLead << std::endl;
-    motorData.close();
-
-  } else {
-    std::cout << "file not found" << std::endl;
-  }*/
+    } else {
+      std::cout << "Robot::TestPeriodic file not found" << std::endl;
+      exit(-1);
+    }
+  }
+  
   
 
 
