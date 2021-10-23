@@ -22,6 +22,9 @@ void Robot::RobotInit() {
 void Robot::RobotPeriodic() {
   frc::SmartDashboard::PutNumber("left y: ", -(m_stick->GetRawAxis(1)));
   frc::SmartDashboard::PutNumber("right x: ", m_stick->GetRawAxis(4));
+  
+  frc::SmartDashboard::PutNumber("currPSI", PSI);
+
 }
  
 void Robot::AutonomousInit() {}
@@ -30,20 +33,27 @@ void Robot::AutonomousPeriodic() {}
 void Robot::TeleopInit() {
   m_leftEncoder.SetPosition(0);
   m_rightEncoder.SetPosition(0);
-  compressor = new frc::Spark(1);
-  pressed_button_pressure = true;
+  pressed_button_pressure = false;
+  valve_start = false;
   
   valve.Set(false);
+  frc::SmartDashboard::PutBoolean("valve", false);
+
   v_shutoffTimerFlag = false;
   v_shutoffTimer->Reset();
 
   v_shutoffDelay = -1; // -1 is default behavior, non zero value is delayed shutoff in seconds
+
+  count = 0;
 }
 void Robot::TeleopPeriodic() {
   left_y = m_stick->GetRawAxis(1);
   right_x = m_stick->GetRawAxis(4);
 
   m_robotDrive->ArcadeDrive(-left_y, right_x);
+
+  frc::SmartDashboard::PutNumber("speedLeft", m_leftFollowMotor->Get());
+  frc::SmartDashboard::PutNumber("speedRight", m_rightFollowMotor->Get());
 
   analog_input->GetVoltage();
   frc::SmartDashboard::PutNumber("analogInput", analog_input->GetVoltage());
@@ -54,10 +64,11 @@ void Robot::TeleopPeriodic() {
   maxPSI = frc::SmartDashboard::GetNumber("maxPSI", 82);
   frc::SmartDashboard::PutNumber("maxPSI", maxPSI);
 
-  v_shutoffDelay = frc::SmartDashboard::GetNumber("valveDelay", 0.75);
+  v_shutoffDelay = frc::SmartDashboard::GetNumber("valveDelay", 0.25);
   frc::SmartDashboard::PutNumber("valveDelay", v_shutoffDelay);
 
   PSI = (analog_input->GetVoltage()) * 100 + 10; // transfer function
+  // to compress
   if (m_stick->GetRawButtonPressed(1)) {
     valve.Set(false);
     pressed_button_pressure = true;
@@ -66,34 +77,38 @@ void Robot::TeleopPeriodic() {
     frc::SmartDashboard::PutBoolean("valve", false);
   }
 
-  if ((m_stick->GetRawButtonPressed(2)) && (reached_max_pressure)) {
-    valve.Set(true);
-    frc::SmartDashboard::PutBoolean("valve", true);
-
-    if (v_shutoffDelay > 0) {
-      if (v_shutoffTimerFlag == false) {
-        // set timer
-        v_shutoffTimer->Reset();
-        v_shutoffTimer->Start();
-        v_shutoffTimerFlag == true;
-      } else {
-        if (v_shutoffTimer->Get() >= v_shutoffDelay) {
-          valve.Set(false); 
-          v_shutoffTimerFlag = false;
-          v_shutoffTimer->Stop();
-        }
-      }
-    }
-  }
-
   if (m_stick->GetRawButtonPressed(3)) {
     valve.Set(false);
     frc::SmartDashboard::PutBoolean("valve", false);
   }
 
+  // debug purposes
+  if (reached_max_pressure) {
+    std::cout << "reached max pressure" << std::endl;
+  }
+
+  if ((m_stick->GetRawButtonPressed(2)) && (reached_max_pressure)) {
+    valve.Set(true);
+    valve_start = true;
+    frc::SmartDashboard::PutBoolean("valve", true);
+  }
+
+  if (valve_start) {
+    v_shutoffTimer->Reset();
+    v_shutoffTimer->Start();
+
+    std::cout << "starting timer" << std::endl;
+    valve_start = false;
+  } else if (v_shutoffTimer->Get() >= v_shutoffDelay) {
+    v_shutoffTimer->Stop();
+    valve.Set(false);
+    frc::SmartDashboard::PutBoolean("valve", false);
+    std::cout << "stopped timer" << std::endl;
+
+  }
+
   if ((!reached_max_pressure) && (pressed_button_pressure)) {
     if (PSI < maxPSI) {
-      frc::SmartDashboard::PutNumber("currPSI", PSI);
       compressor->Set(1);
     } else {
       compressor->Set(0);
