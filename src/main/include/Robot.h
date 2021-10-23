@@ -16,6 +16,7 @@
 #include <fstream>
 #include <stdio.h>
 #include <ctime>
+#include <list>
 
 class Robot : public frc::TimedRobot {
  public:

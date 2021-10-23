@@ -108,24 +108,8 @@ void Robot::DisabledInit() {}
 void Robot::DisabledPeriodic() {}
 
 void Robot::TestInit() {
-  
-  count = 0;
-
-  motorData.open(filename, std::ios::app);
-
-  time_t now = time(0);
-  char* date_time = ctime(&now);
-
-  if (motorData) {
-    motorData << "Logging data at " << date_time << std::endl;
-
-    std::cout << "Robot::TestInit: wrote time in file" << std::endl;
-    
-    motorData.close();
-  } else {
-    std::cout << "Robot::TestInit: unable to open file " << filename << std::endl;
-  }
-
+ 
+  std::list<int> possibleMotorIDs = []
 }
 void Robot::TestPeriodic() {
   
