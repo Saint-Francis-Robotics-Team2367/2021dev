@@ -5,19 +5,38 @@
 #include "Robot.h"
 #include <frc/smartdashboard/SmartDashboard.h>
 
-void Robot::RobotInit() {
-  // m_leftLeadMotor->RestoreFactoryDefaults();
-  m_rightLeadMotor->RestoreFactoryDefaults();
-  // m_leftFollowMotor->RestoreFactoryDefaults();
-  // m_rightFollowMotor->RestoreFactoryDefaults();
+// roboRIO-TEAM-frc.local
 
-  // m_leftEncoder.SetPosition(0);
+void Robot::RobotInit() {
+  m_leftLeadMotor->RestoreFactoryDefaults();
+  m_rightLeadMotor->RestoreFactoryDefaults();
+  m_leftFollowMotor->RestoreFactoryDefaults();
+  m_rightFollowMotor->RestoreFactoryDefaults();
+
+  m_leftEncoder.SetPosition(0);
   m_rightEncoder.SetPosition(0);
 
-  // m_leftLeadMotor->SetInverted(true);
-  // m_leftFollowMotor->Follow(*m_leftLeadMotor, false);
-  m_rightLeadMotor->SetInverted(false);
-  // m_rightFollowMotor->Follow(*m_rightLeadMotor, false);
+  m_leftLeadMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
+  m_rightLeadMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
+  m_leftFollowMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
+  m_rightFollowMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
+
+  m_leftLeadMotor->SetInverted(true);
+  m_leftFollowMotor->Follow(*m_leftLeadMotor, false);
+  m_rightLeadMotor->SetInverted(false); 
+  m_rightFollowMotor->Follow(*m_rightLeadMotor, false);
+
+  std::cout << "Robot::RobotInit filename: " << filename << std::endl;
+  motorData.open(filename);
+  
+  if (motorData) {
+    motorData << "count,left_input_speed,right_input_speed,speed_left_lead,speed_left_follow,speed_right_lead,speed_right_follow,left_motor_equal,right_motor_equal" << std::endl;
+    std::cout << "Robot::RobotInit: wrote headers in file" << std::endl;
+    
+    motorData.close();
+  } else {
+    std::cout << "Robot::RobotInit: unable to open file " << filename << std::endl;
+  }
 }
 void Robot::RobotPeriodic() {
   frc::SmartDashboard::PutNumber("left y: ", -(m_stick->GetRawAxis(1)));
@@ -29,7 +48,7 @@ void Robot::AutonomousPeriodic() {}
 
 void Robot::TeleopInit() {
   frc::Solenoid valve{0};
-  // m_leftEncoder.SetPosition(0);
+  m_leftEncoder.SetPosition(0);
   m_rightEncoder.SetPosition(0);
   compressor = new frc::Spark(1);
   pressed_button_pressure = true;
@@ -39,7 +58,7 @@ void Robot::TeleopPeriodic() {
   left_y = m_stick->GetRawAxis(1);
   right_x = m_stick->GetRawAxis(4);
 
-  // m_robotDrive->ArcadeDrive(-left_y, right_x);
+  m_robotDrive->ArcadeDrive(-left_y, right_x);
 
   analog_input->GetVoltage();
   frc::SmartDashboard::PutNumber("analogInput", analog_input->GetVoltage());
@@ -92,12 +111,15 @@ void Robot::TestInit() {
   
   count = 0;
 
-  std::cout << "Robot::TestInit filename: " << filename << std::endl;
-  motorData.open(filename);
-  
+  motorData.open(filename, std::ios::app);
+
+  time_t now = time(0);
+  char* date_time = ctime(&now);
+
   if (motorData) {
-    motorData << "count,left_input_speed,right_input_speed,speed_left_lead,speed_left_follow,speed_right_lead,speed_right_follow,left_motor_equal,right_motor_equal" << std::endl;
-    std::cout << "Robot::TestInit: wrote headers in file" << std::endl;
+    motorData << "Logging data at " << date_time << std::endl;
+
+    std::cout << "Robot::TestInit: wrote time in file" << std::endl;
     
     motorData.close();
   } else {
@@ -113,21 +135,21 @@ void Robot::TestPeriodic() {
   frc::SmartDashboard::PutNumber("setLeft", left_inputSpeed);
   frc::SmartDashboard::PutNumber("setRight", right_inputSpeed);
 
-  // m_leftLeadMotor->Set(left_inputSpeed);
+  m_leftLeadMotor->Set(left_inputSpeed);
   m_rightLeadMotor->Set(right_inputSpeed);
 
    // sleep(10);
 
-  // speed_leftLead = m_leftLeadMotor->Get();
+  speed_leftLead = m_leftLeadMotor->Get();
   frc::SmartDashboard::PutNumber("speed_leftLead", speed_leftLead);
 
-  // speed_leftFollow = m_leftFollowMotor->Get();
+  speed_leftFollow = m_leftFollowMotor->Get();
   frc::SmartDashboard::PutNumber("speed_leftFollow", speed_leftFollow);
 
   speed_rightLead = m_rightLeadMotor->Get();
   frc::SmartDashboard::PutNumber("speed_rightLead", speed_rightLead);
 
-  // speed_rightFollow = m_rightFollowMotor->Get();
+  speed_rightFollow = m_rightFollowMotor->Get();
   frc::SmartDashboard::PutNumber("speed_rightFollow", speed_rightFollow);
 
   if (speed_leftLead == speed_leftFollow) {
