@@ -46,6 +46,14 @@ void Robot::RobotPeriodic() {
 void Robot::AutonomousInit() {}
 void Robot::AutonomousPeriodic() {}
 
+class motorIDCheck {
+  public:
+    int motorID;
+    rev::CANSparkMax* m_Motor = new rev::CANSparkMax(motorID, rev::CANSparkMax::MotorType::kBrushless);
+    
+
+}
+
 void Robot::TeleopInit() {
   frc::Solenoid valve{0};
   m_leftEncoder.SetPosition(0);

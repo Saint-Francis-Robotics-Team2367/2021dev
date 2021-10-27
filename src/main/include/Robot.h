@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <ctime>
 #include <list>
+#include <Error.h>
 
 class Robot : public frc::TimedRobot {
  public:
