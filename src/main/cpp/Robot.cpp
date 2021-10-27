@@ -14,6 +14,11 @@ void Robot::RobotInit() {
   m_leftEncoder.SetPosition(0);
   m_rightEncoder.SetPosition(0);
 
+  m_leftLeadMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
+  m_rightLeadMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
+  m_leftFollowMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
+  m_rightFollowMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
+
   m_leftLeadMotor->SetInverted(true);
   m_leftFollowMotor->Follow(*m_leftLeadMotor, false);
   m_rightLeadMotor->SetInverted(false);
