@@ -31,6 +31,39 @@ void Robot::RobotPeriodic()
   frc::SmartDashboard::PutNumber("Conversion", Robot::convertDistanceToTicks(1));
   //frc::SmartDashboard::PutNumber("current position", currentPosition);
 }
+void Robot::PIDValueDrawing(){
+  double delta = frc::SmartDashboard::GetNumber("delta", 1);
+  //frc::SmartDashboard::PutNumber("delta", delta);
+  double currDelta = delta;
+  //Making it so you can manually set m_p and positionTotal: m_p is essential with PID, change by an order of magnitude to start run
+  double m_P = frc::SmartDashboard::GetNumber("Pd", 0.5);
+  //bool isNegative;
+  m_leftLeadMotor->GetPIDController().SetP(m_P);
+  m_rightLeadMotor->GetPIDController().SetP(m_P);
+  frc::SmartDashboard::PutNumber("Pd", m_P);
+  double waitTime = frc::SmartDashboard::GetNumber("waitTime", 4);
+  double currWait = waitTime;
+  //frc::SmartDashboard::PutNumber("waitTime", waitTime);
+  // positionTotal = frc::SmartDashboard::GetNumber("positionTotal", 6);
+  // frc::SmartDashboard::PutNumber("positionTotal", positionTotal);
+  // positionTotal = -6;
+ 
+  double currTime = frc::Timer::GetFPGATimestamp();
+  frc::SmartDashboard::PutNumber("currTime", currTime);
+  if(currTime > prevTime + currWait) {
+      m_leftLeadMotor->GetPIDController().SetReference(currDelta, rev::ControlType::kPosition);
+      currDelta = currDelta * -1.0;
+      m_rightLeadMotor->GetPIDController().SetReference(currDelta, rev::ControlType::kPosition);
+      prevTime = frc::Timer::GetFPGATimestamp();
+ 
+ 
+      frc::SmartDashboard::PutNumber("Right Encoder", m_rightEncoder.GetPosition());
+      frc::SmartDashboard::PutNumber("Left Encoder", m_leftEncoder.GetPosition());
+      frc::SmartDashboard::PutNumber("Motor Current", m_leftLeadMotor->GetOutputCurrent());
+      prevTime = frc::Timer::GetFPGATimestamp();
+      frc::SmartDashboard::PutNumber("prevTime", prevTime);
+      testBool = !testBool;
+}
 
 void Robot::AutonomousInit()
 {
@@ -121,7 +154,9 @@ void Robot::AutonomousPeriodic() {
   }
 }
 
-void Robot::TeleopInit() {}
+void Robot::TeleopInit() {
+
+}
 void Robot::TeleopPeriodic()
 {
   // suggest putting this code into one single method in a new file b/c it's very messy for TeleopPeriodic
