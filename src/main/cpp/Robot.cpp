@@ -31,7 +31,8 @@ void Robot::RobotPeriodic()
   frc::SmartDashboard::PutNumber("Conversion", Robot::convertDistanceToTicks(1));
   //frc::SmartDashboard::PutNumber("current position", currentPosition);
 }
-void Robot::PIDValueDrawing(){
+void Robot::PIDValueDrawing()
+{
   double delta = frc::SmartDashboard::GetNumber("delta", 1);
   //frc::SmartDashboard::PutNumber("delta", delta);
   double currDelta = delta;
@@ -62,7 +63,8 @@ void Robot::PIDValueDrawing(){
       frc::SmartDashboard::PutNumber("Motor Current", m_leftLeadMotor->GetOutputCurrent());
       prevTime = frc::Timer::GetFPGATimestamp();
       frc::SmartDashboard::PutNumber("prevTime", prevTime);
-      testBool = !testBool;
+      
+  }
 }
 
 void Robot::AutonomousInit()
