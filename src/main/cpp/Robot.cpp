@@ -8,23 +8,23 @@
 // roboRIO-TEAM-frc.local
 
 void Robot::RobotInit() {
-  m_leftLeadMotor->RestoreFactoryDefaults();
+  // m_leftLeadMotor->RestoreFactoryDefaults();
   m_rightLeadMotor->RestoreFactoryDefaults();
-  m_leftFollowMotor->RestoreFactoryDefaults();
-  m_rightFollowMotor->RestoreFactoryDefaults();
+  // m_leftFollowMotor->RestoreFactoryDefaults();
+  // m_rightFollowMotor->RestoreFactoryDefaults();
 
-  m_leftEncoder.SetPosition(0);
+  // m_leftEncoder.SetPosition(0);
   m_rightEncoder.SetPosition(0);
 
-  m_leftLeadMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
+  // m_leftLeadMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
   m_rightLeadMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
-  m_leftFollowMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
-  m_rightFollowMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
+  // m_leftFollowMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
+  // m_rightFollowMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
 
-  m_leftLeadMotor->SetInverted(true);
-  m_leftFollowMotor->Follow(*m_leftLeadMotor, false);
+  // m_leftLeadMotor->SetInverted(true);
+  // m_leftFollowMotor->Follow(*m_leftLeadMotor, false);
   m_rightLeadMotor->SetInverted(false); 
-  m_rightFollowMotor->Follow(*m_rightLeadMotor, false);
+  // m_rightFollowMotor->Follow(*m_rightLeadMotor, false);
 
   std::cout << "Robot::RobotInit filename: " << filename << std::endl;
   motorData.open(filename);
@@ -61,7 +61,7 @@ void Robot::AutonomousPeriodic() {}
 
 void Robot::TeleopInit() {
   frc::Solenoid valve{0};
-  m_leftEncoder.SetPosition(0);
+  // m_leftEncoder.SetPosition(0);
   m_rightEncoder.SetPosition(0);
   compressor = new frc::Spark(1);
   pressed_button_pressure = true;
@@ -71,7 +71,7 @@ void Robot::TeleopPeriodic() {
   left_y = m_stick->GetRawAxis(1);
   right_x = m_stick->GetRawAxis(4);
 
-  m_robotDrive->ArcadeDrive(-left_y, right_x);
+  // m_robotDrive->ArcadeDrive(-left_y, right_x);
 
   analog_input->GetVoltage();
   frc::SmartDashboard::PutNumber("analogInput", analog_input->GetVoltage());
@@ -135,13 +135,13 @@ void Robot::TestPeriodic() {
       std::cout << "Motor ID: " << i << "at address " << &motorList[i] << std::endl;
       motorList[i]->Set(0.5);
       std::cout << "GetLastError message" << motorList[i]->GetLastError() << std::endl;;
-/*       if (motorList[i]->GetLastError() != ""){
+       if (motorList[i]->GetLastError() == rev::CANError::kCantFindFirmware){
         delete motorList[i]; 
         
         std::cout << "Removed Motor ID " << i << "at address " << &motorList[i] << std::endl;
       }
         
-      } */
+      } 
     }
     testedMotors = true;
     std::cout << "Done testing motor IDs" << std::endl;
@@ -158,22 +158,23 @@ void Robot::TestPeriodic() {
   frc::SmartDashboard::PutNumber("setLeft", left_inputSpeed);
   frc::SmartDashboard::PutNumber("setRight", right_inputSpeed);
 
-  m_leftLeadMotor->Set(left_inputSpeed);
+
+  // m_leftLeadMotor->Set(left_inputSpeed);
   m_rightLeadMotor->Set(right_inputSpeed);
 
    // sleep(10);
 
-  speed_leftLead = m_leftLeadMotor->Get();
-  frc::SmartDashboard::PutNumber("speed_leftLead", speed_leftLead);
+  // speed_leftLead = m_leftLeadMotor->Get();
+  // frc::SmartDashboard::PutNumber("speed_leftLead", speed_leftLead);
 
-  speed_leftFollow = m_leftFollowMotor->Get();
-  frc::SmartDashboard::PutNumber("speed_leftFollow", speed_leftFollow);
+  // speed_leftFollow = m_leftFollowMotor->Get();
+  // frc::SmartDashboard::PutNumber("speed_leftFollow", speed_leftFollow);
 
   speed_rightLead = m_rightLeadMotor->Get();
   frc::SmartDashboard::PutNumber("speed_rightLead", speed_rightLead);
 
-  speed_rightFollow = m_rightFollowMotor->Get();
-  frc::SmartDashboard::PutNumber("speed_rightFollow", speed_rightFollow);
+  // speed_rightFollow = m_rightFollowMotor->Get();
+  // frc::SmartDashboard::PutNumber("speed_rightFollow", speed_rightFollow);
 
   if (speed_leftLead == speed_leftFollow) {
     leftMotor_equal = true;

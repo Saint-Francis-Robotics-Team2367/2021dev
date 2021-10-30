@@ -79,6 +79,7 @@
     "typeinfo": "cpp",
     "math": "cpp",
     "codecvt": "cpp",
-    "filesystem": "cpp"
+    "filesystem": "cpp",
+    "*.inc": "cpp"
   }
 }
