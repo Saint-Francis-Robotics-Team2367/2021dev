@@ -4,6 +4,7 @@
 
 #include "SFDrive.h"
 #include <math.h>
+#include <frc/Timer.h>
 //Maybe smart dashboard if I want, could gobal variable, h file thing too if I want (figure out)
 
 
@@ -58,4 +59,56 @@ void SFDrive::ArcadeDrive(double joystickX, double joystickY) {
   leftLeadMotor->Set(-leftMotorOutput);
   //negate here
   rightLeadMotor->Set(rightMotorOutput);
+}
+
+void SFDrive::PIDDrive(float totalFeet, float maxAcc, float maxVelocity) {
+  //forward movement only *implement backwards movement with if statement if necessary
+  float currentPosition, currentVelocity, timeElapsed, distanceToDeccelerate, setpoint = 0; //currentPosition is the set point
+  float prevTime = frc::Timer::GetFPGATimestamp();
+  while(currentPosition < totalFeet){
+    timeElapsed = frc::Timer::GetFPGATimestamp() - prevTime;
+    distanceToDeccelerate = (3 * currentVelocity * currentVelocity) / (2 * maxAcc);
+    if (distanceToDeccelerate > totalFeet - currentPosition) {
+      currentVelocity -= (maxAcc * timeElapsed);
+    }
+    else //increase velocity
+    {
+      currentVelocity += (maxAcc * timeElapsed);
+      if (currentVelocity > maxVelocity)
+      {
+        currentVelocity = maxVelocity;
+      }
+    }
+
+    currentPosition += currentVelocity * timeElapsed;
+    if(currentPosition > totalFeet) {
+      currentPosition = totalFeet;
+    }
+
+    //converting currentPosition to ticks? for the motor: inches / (circum) * ticks * gearboxRatio, might look at this later
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    setpoint = (currentPosition * 12) / (PI * 5.7) * 42 * (0.168); // for now this is ticks (maybe rotations / gearRatio if not then)
+    leftLeadMotor->GetPIDController().SetReference(setpoint, rev::ControlType::kPosition);
+    rightLeadMotor->GetPIDController().SetReference(-setpoint, rev::ControlType::kPosition);
+    prevTime = frc::Timer::GetFPGATimestamp();
+  }
+}
+
+
+void SFDrive::setP(double value)
+{
+    leftLeadMotor->GetPIDController().SetP(value);
+    rightLeadMotor->GetPIDController().SetP(value);
+}
+
+void SFDrive::setI(double value)
+{
+    leftLeadMotor->GetPIDController().SetI(value);
+    rightLeadMotor->GetPIDController().SetI(value);
+}
+
+void SFDrive::setD(double value)
+{
+    leftLeadMotor->GetPIDController().SetD(value);
+    rightLeadMotor->GetPIDController().SetD(value);
 }

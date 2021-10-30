@@ -10,6 +10,7 @@ class SFDrive {
  public:
   // member variables
   const double deadband = 0.08;
+  const double PI = 3.14159265;
   rev::CANSparkMax* leftLeadMotor = nullptr;
   rev::CANSparkMax* rightLeadMotor = nullptr;
   rev::CANSparkMax* leftFollowMotor = nullptr;
@@ -21,4 +22,9 @@ class SFDrive {
  public:
   // methods
   void ArcadeDrive(double joystickX, double joystickY);
+  void PIDDrive(float feet, float maxAcc, float maxVelocity);
+  void PIDTuning();
+  void setP(double value);
+  void setI(double value);
+  void setD(double value);
 };

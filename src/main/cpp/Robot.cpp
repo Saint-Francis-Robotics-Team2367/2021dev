@@ -67,10 +67,8 @@ void Robot::PIDTesting() {
 
   double waitTime = frc::SmartDashboard::GetNumber("waitTime", 4);
   frc::SmartDashboard::PutNumber("waitTime", waitTime);
-  //frc::SmartDashboard::PutNumber("waitTime", waitTime);
-  // positionTotal = frc::SmartDashboard::GetNumber("positionTotal", 6);
-  // frc::SmartDashboard::PutNumber("positionTotal", positionTotal);
-  // positionTotal = -6;
+
+  //Can add a delta thing here, but that might make it slightly weird so its fine for now ig
  
   double currTime = frc::Timer::GetFPGATimestamp();
   frc::SmartDashboard::PutNumber("currTime", currTime);
@@ -95,26 +93,18 @@ void Robot::PIDTesting() {
 
 void Robot::AutonomousInit()
 {
+  //PID tuned values for t-shirt cannon, having init here instead of SFDrive, might change later
+  double m_P = 0.23, m_I = 0.04, m_D = 1.68, iZone = 0.04;
 
-  //wait so if it doesnt show me the rest of the values it gives, its probabl the PID
-  //double m_P = 0.05, m_I = 0.05, m_D = 0.1, kMaxOutput = 0.25, kMinOutput = -0.25;
-  //m_P can start at 0.0005, but then is changed in periodic
-  double m_P = 0.23, m_I = 0.04, m_D = 1.68, iZone = 0.04, kMaxOutput = 0.25, kMinOutput = -0.25;
-  //frc::SmartDashboard::PutNumber("Pd", m_P);
-
-  //or do I set this to 0
-  //Set feet here
   m_leftLeadMotor->GetPIDController().SetP(m_P);
   m_leftLeadMotor->GetPIDController().SetI(m_I);
   m_leftLeadMotor->GetPIDController().SetD(m_D);
   m_leftLeadMotor->GetPIDController().SetIZone(iZone);
-  //m_leftLeadMotor->GetPIDController().SetOutputRange(kMinOutput, kMaxOutput);
 
   m_rightLeadMotor->GetPIDController().SetP(m_P);
   m_rightLeadMotor->GetPIDController().SetI(m_I);
   m_rightLeadMotor->GetPIDController().SetD(m_D);
   m_rightLeadMotor->GetPIDController().SetIZone(iZone);
-  //m_rightLeadMotor->GetPIDController().SetOutputRange(kMinOutput, kMaxOutput);
 
   m_leftEncoder.SetPosition(0);
   m_rightEncoder.SetPosition(0);
@@ -126,6 +116,7 @@ void Robot::AutonomousInit()
   currentPosition = 0;
   currentVelocity = 0;
 }
+
 void Robot::AutonomousPeriodic() {
   //Making it so you can manually set m_p and positionTotal: m_p is essential with PID, change by an order of magnitude to start run
   double m_P = frc::SmartDashboard::GetNumber("Pd", 0.1);
@@ -147,6 +138,7 @@ void Robot::AutonomousPeriodic() {
   if (currentPosition < positionTotal) {
     double timeElapsed = frc::Timer::GetFPGATimestamp() - prevTime;
 
+    //check again, could be innacurate
     distanceToDeccelerate = (3 * currentVelocity * currentVelocity) / (2 * maxAcc);
 
     //If the amount of distance we have is less than distance to deccelerate, reduce velocity, by the most possible
@@ -183,6 +175,7 @@ void Robot::AutonomousPeriodic() {
     prevTime = frc::Timer::GetFPGATimestamp();
   }
   ///PIDTesting();
+  //check if encoder stuff in init passes through, it should cause its a reference
 }
 
 void Robot::TeleopInit() {
