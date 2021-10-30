@@ -97,7 +97,48 @@ void SFDrive::PIDDrive(float totalFeet, float maxAcc, float maxVelocity) {
 }
 
 void SFDrive::PIDTurn(float angle, float radius, float maxAcc, float maxVelocity) {
+  m_leftEncoder.SetPosition(0);
+  m_rightEncoder.SetPosition(0);
+  float currentPosition, currentVelocity, endpoint, setpoint, timeElapsed, distanceToDeccelerate = 0; //currentPosition is the set point
+  float prevTime = frc::Timer::GetFPGATimestamp();
+  endpoint = ((angle/360.0) * (2 * PI * radius));
 
+
+
+  while(currentPosition < endpoint){
+    timeElapsed = frc::Timer::GetFPGATimestamp() - prevTime;
+    distanceToDeccelerate = (3 * currentVelocity * currentVelocity) / (2 * maxAcc);
+    if (distanceToDeccelerate > endpoint - currentPosition) {
+      currentVelocity -= (maxAcc * timeElapsed);
+    }
+    else //increase velocity
+    {
+      currentVelocity += (maxAcc * timeElapsed);
+      if (currentVelocity > maxVelocity)
+      {
+        currentVelocity = maxVelocity;
+      }
+    }
+
+    currentPosition += currentVelocity * timeElapsed;
+    if(currentPosition > endpoint) {
+      currentPosition = endpoint;
+    }
+
+    //converting currentPosition to ticks? for the motor: inches / (circum) * ticks * gearboxRatio, might look at this later
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    setpoint = (currentPosition * 12) / (PI * 5.7) * 42 * (0.168); // for now this is ticks (maybe rotations / gearRatio if not then)
+    leftLeadMotor->GetPIDController().SetReference(setpoint, rev::ControlType::kPosition);
+    rightLeadMotor->GetPIDController().SetReference(0, rev::ControlType::kPosition); //what goes here
+    prevTime = frc::Timer::GetFPGATimestamp();
+
+    //Overall questions -> What goes in setReference second, is this right, but the robot is standing still right, 
+    //so during path planning we call PID turning to move a certain angle, but it won't turn in place?, how do we want it to turn
+    //because we have different radius's so the angle turns a different distance each time along the circle, is that what we're trying
+    //not just in place
+    //ask on saturday ig
+  }
+  //we should have some inner set point though right?
 }
 
 
