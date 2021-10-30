@@ -32,67 +32,10 @@ void Robot::RobotPeriodic()
   //frc::SmartDashboard::PutNumber("current position", currentPosition);
 }
 
-void Robot::PIDTesting() {
-  //frc::SmartDashboard::PutNumber("delta", delta);
-  double currentLeftLead = m_leftLeadMotor->GetOutputCurrent();
-  double currentRightLead = m_rightLeadMotor->GetOutputCurrent();
-  frc::SmartDashboard::PutNumber("Total Current", currentLeftLead+currentRightLead);
-
-  //Making it so you can manually set m_p and positionTotal: m_p is essential with PID, change by an order of magnitude to start run
-  double m_P = frc::SmartDashboard::GetNumber("Pd", 0.30);
-  //bool isNegative;
-  m_leftLeadMotor->GetPIDController().SetP(m_P);
-  m_rightLeadMotor->GetPIDController().SetP(m_P);
-  frc::SmartDashboard::PutNumber("Pd", m_P);
-
-  double m_D = frc::SmartDashboard::GetNumber("D Value", 0.0);
-  //bool isNegative;
-  m_leftLeadMotor->GetPIDController().SetD(m_D);
-  m_rightLeadMotor->GetPIDController().SetD(m_D);
-  frc::SmartDashboard::PutNumber("D Value", m_D);
-
-  double m_I = frc::SmartDashboard::GetNumber("I Value", 0.0);
-  //bool isNegative;
-  m_leftLeadMotor->GetPIDController().SetI(m_I);
-  m_rightLeadMotor->GetPIDController().SetI(m_I);
-  frc::SmartDashboard::PutNumber("I Value", m_I);
-
- double I_Zone = frc::SmartDashboard::GetNumber("I_Zone", 0.0);
-  //bool isNegative;
-  m_leftLeadMotor->GetPIDController().SetIZone(I_Zone);
-  m_rightLeadMotor->GetPIDController().SetIZone(I_Zone);
-  frc::SmartDashboard::PutNumber("I_Zone", I_Zone);
-
-  m_leftLeadMotor->GetPIDController().SetIZone(I_Zone);
-
-  double waitTime = frc::SmartDashboard::GetNumber("waitTime", 4);
-  frc::SmartDashboard::PutNumber("waitTime", waitTime);
-
-  //Can add a delta thing here, but that might make it slightly weird so its fine for now ig
- 
-  double currTime = frc::Timer::GetFPGATimestamp();
-  frc::SmartDashboard::PutNumber("currTime", currTime);
-  frc::SmartDashboard::PutNumber("Setpoint", delta);
-  if(currTime > prevTime + waitTime) {
-      m_leftLeadMotor->GetPIDController().SetReference(delta, rev::ControlType::kPosition);
-      delta = delta * -1.0;
-      m_rightLeadMotor->GetPIDController().SetReference(delta, rev::ControlType::kPosition);
- 
-      frc::SmartDashboard::PutNumber("Right Encoder", m_rightEncoder.GetPosition());
-      frc::SmartDashboard::PutNumber("Left Encoder", m_leftEncoder.GetPosition());
-      //frc::SmartDashboard::PutNumber("Motor Current", m_leftLeadMotor->GetOutputCurrent());
-
-      prevTime = frc::Timer::GetFPGATimestamp();
-      frc::SmartDashboard::PutNumber("prevTime", prevTime);
-  }
-  //Testing for single graph
-  // frc::SmartDashboard::PutNumber("Single Graph", m_leftEncoder.GetPosition());
-  // frc::SmartDashboard::PutNumber("Single Graph", delta);
-  // frc::SmartDashboard::PutNumber("Single Graph", currentLeftLead+currentRightLead);
-}
 
 void Robot::AutonomousInit()
 {
+  //maybe init all in the constructor
   //PID tuned values for t-shirt cannon, having init here instead of SFDrive, might change later
   double m_P = 0.23, m_I = 0.04, m_D = 1.68, iZone = 0.04;
 
@@ -109,73 +52,19 @@ void Robot::AutonomousInit()
   m_leftEncoder.SetPosition(0);
   m_rightEncoder.SetPosition(0);
 
-  // 15:1 reduction (assumptions), with a 5.7 Diameter wheel
-  m_leftEncoder.SetPositionConversionFactor(14 / 50 * (24 / 40));
-  m_rightEncoder.SetPositionConversionFactor(14 / 50 * (24 / 40));
-  prevTime = frc::Timer::GetFPGATimestamp();
-  currentPosition = 0;
-  currentVelocity = 0;
+  m_leftEncoder.SetPositionConversionFactor(14 / 50 * (24 / 40)); //check if this works!
+  m_rightEncoder.SetPositionConversionFactor(14 / 50 * (24 / 40)); 
+
 }
 
 void Robot::AutonomousPeriodic() {
-  //Making it so you can manually set m_p and positionTotal: m_p is essential with PID, change by an order of magnitude to start run
-  double m_P = frc::SmartDashboard::GetNumber("Pd", 0.1);
-  bool isNegative;
-  m_leftLeadMotor->GetPIDController().SetP(m_P);
-  m_rightLeadMotor->GetPIDController().SetP(m_P);
-
-  positionTotal = frc::SmartDashboard::GetNumber("positionTotal", 3);
-  frc::SmartDashboard::PutNumber("positionTotal", positionTotal);
-
-  //So the robot can move backwards in auto, if it ever needs too
-  if (positionTotal < 0) {
-    isNegative = true;
-    positionTotal = fabs(positionTotal);
-    frc::SmartDashboard::PutBoolean("isNegative", true);
+  double shouldGo = frc::SmartDashboard::GetBoolean("ShouldGo", false);
+  frc::SmartDashboard::PutBoolean("ShouldGo", shouldGo);
+  if(shouldGo) {
+    //m_robotDrive->PIDTuning(1);
+    m_robotDrive->PIDDrive(3, 7, 21);
   }
-
-  //if positionTotal was negative, this statement would never be true, and robot couldn't drive backwards 0 < -6ß
-  if (currentPosition < positionTotal) {
-    double timeElapsed = frc::Timer::GetFPGATimestamp() - prevTime;
-
-    //check again, could be innacurate
-    distanceToDeccelerate = (3 * currentVelocity * currentVelocity) / (2 * maxAcc);
-
-    //If the amount of distance we have is less than distance to deccelerate, reduce velocity, by the most possible
-    if (distanceToDeccelerate > positionTotal - currentPosition) {
-      currentVelocity -= (maxAcc * timeElapsed);
-    }
-    else //increase velocity
-    {
-      currentVelocity += (maxAcc * timeElapsed);
-      if (currentVelocity > maxVelocity)
-      {
-        currentVelocity = maxVelocity;
-      }
-    }
-    //or setpoint
-    currentPosition += currentVelocity * timeElapsed;
-    if(currentPosition > positionTotal) {
-      currentPosition = positionTotal;
-    }
-    
-    //0.168 is gear ratio
-    double inRots = (currentPosition * 12) / (3.14 * 5.7) * 42 * (0.168);
-    frc::SmartDashboard::PutNumber("convertedToRotsPoint", inRots);
-    //so it goes in the right direction
-    if(isNegative) {
-      m_leftLeadMotor->GetPIDController().SetReference(-inRots, rev::ControlType::kPosition);
-      m_rightLeadMotor->GetPIDController().SetReference(inRots, rev::ControlType::kPosition);
-    } else {
-      m_leftLeadMotor->GetPIDController().SetReference(inRots, rev::ControlType::kPosition);
-      m_rightLeadMotor->GetPIDController().SetReference(-inRots, rev::ControlType::kPosition);
-    }
-    
-
-    prevTime = frc::Timer::GetFPGATimestamp();
-  }
-  ///PIDTesting();
-  //check if encoder stuff in init passes through, it should cause its a reference
+  
 }
 
 void Robot::TeleopInit() {

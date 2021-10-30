@@ -5,6 +5,7 @@
 #pragma once
 
 #include "rev/CANSparkMax.h"
+#include <frc/smartdashboard/SmartDashboard.h>
 
 class SFDrive {
  public:
@@ -15,7 +16,9 @@ class SFDrive {
   rev::CANSparkMax* rightLeadMotor = nullptr;
   rev::CANSparkMax* leftFollowMotor = nullptr;
   rev::CANSparkMax* rightFollowMotor = nullptr;
-
+  //works ig?
+  rev::CANEncoder m_leftEncoder = leftLeadMotor->GetEncoder(rev::CANEncoder::EncoderType::kHallSensor, 42);
+  rev::CANEncoder m_rightEncoder = rightLeadMotor->GetEncoder(rev::CANEncoder::EncoderType::kHallSensor, 42);
   // constructor
   SFDrive(rev::CANSparkMax* leftLeadMotor, rev::CANSparkMax* rightLeadMotor, rev::CANSparkMax* leftFollowMotor, rev::CANSparkMax* rightFollowMotor);
   
@@ -23,7 +26,8 @@ class SFDrive {
   // methods
   void ArcadeDrive(double joystickX, double joystickY);
   void PIDDrive(float feet, float maxAcc, float maxVelocity);
-  void PIDTuning();
+  void PIDTurn(float angle, float radius, float maxAcc, float maxVelocity);
+  void PIDTuning(float delta);
   void setP(double value);
   void setI(double value);
   void setD(double value);
