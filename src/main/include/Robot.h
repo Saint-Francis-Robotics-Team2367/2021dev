@@ -35,8 +35,10 @@ class Robot : public frc::TimedRobot {
 
   double distanceToDeccelerate;
   double currentVelocity;
+  //change these
   const double maxVelocity = 21;
-  const double maxAcc = 20;
+  const double maxAcc = 7;
+  double delta = 1;
   //setpoint (in feet for now)
   double positionTotal = 6;
   //currpos
