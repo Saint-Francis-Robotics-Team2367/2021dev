@@ -63,6 +63,8 @@ class Robot : public frc::TimedRobot {
 
   int count;
 
+  bool testedMotors;
+
   std::string filename = "/home/lvuser/logdata.csv";
 
   frc::AnalogInput * analog_input = new frc::AnalogInput(1);

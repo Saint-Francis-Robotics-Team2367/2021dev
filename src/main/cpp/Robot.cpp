@@ -46,13 +46,18 @@ void Robot::RobotPeriodic() {
 void Robot::AutonomousInit() {}
 void Robot::AutonomousPeriodic() {}
 
-class motorIDCheck {
+/* class motorIDCheck {
   public:
     int motorID;
-    rev::CANSparkMax* m_Motor = new rev::CANSparkMax(motorID, rev::CANSparkMax::MotorType::kBrushless);
-    
+  
+  rev::CANSparkMax* m_Motor = new rev::CANSparkMax(motorID, rev::CANSparkMax::MotorType::kBrushless);
 
-}
+  if (error(Set(0.5))) {
+    return 0
+  } else {
+    return 1
+  }
+} */
 
 void Robot::TeleopInit() {
   frc::Solenoid valve{0};
@@ -117,9 +122,35 @@ void Robot::DisabledPeriodic() {}
 
 void Robot::TestInit() {
  
-  std::list<int> possibleMotorIDs = []
+  int motorList[16];
+
+  testedMotors = false;
+
 }
 void Robot::TestPeriodic() {
+  
+  if (testedMotors == false) {
+    for (int i; i < 16; i++) {
+      rev::CANSparkMax* motorList[i] = new rev::CANSparkMax(i, rev::CANSparkMax::MotorType::kBrushless);
+      std::cout << "Motor ID: " << i << "at address " << &motorList[i] << std::endl;
+      motorList[i]->Set(0.5);
+      std::cout << "GetLastError message" << motorList[i]->GetLastError() << std::endl;;
+/*       if (motorList[i]->GetLastError() != ""){
+        delete motorList[i]; 
+        
+        std::cout << "Removed Motor ID " << i << "at address " << &motorList[i] << std::endl;
+      }
+        
+      } */
+    }
+    testedMotors = true;
+    std::cout << "Done testing motor IDs" << std::endl;
+    std::cout << "Printing list..." << std::endl;
+    for (int item : motorList) {
+      std::cout << item << " ";
+    }
+  }
+  
   
   left_inputSpeed = frc::SmartDashboard::GetNumber("setLeft", 0);
   right_inputSpeed = frc::SmartDashboard::GetNumber("setRight", 0);
@@ -157,7 +188,7 @@ void Robot::TestPeriodic() {
 
   count++;
   
-  if (count % 50 == 0) {
+  /* if (count % 50 == 0) {
     motorData.open(filename, std::ios::app); // open with append
   
     if (motorData) {
@@ -179,7 +210,7 @@ void Robot::TestPeriodic() {
       std::cout << "Robot::TestPeriodic file not found" << std::endl;
       exit(-1);
     }
-  }
+  } */
   
 }
 
