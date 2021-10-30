@@ -56,6 +56,7 @@ class Robot : public frc::TimedRobot {
   void TestPeriodic() override;
   void PIDValueDrawing();
   double convertDistanceToTicks(double);
+  void PIDTesting();
 
  private:
   frc::SendableChooser<std::string> m_chooser;

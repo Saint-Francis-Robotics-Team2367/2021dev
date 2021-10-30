@@ -67,6 +67,40 @@ void Robot::PIDValueDrawing()
   }
 }
 
+void Robot::PIDTesting() {
+  double delta = frc::SmartDashboard::GetNumber("delta", 1);
+  //frc::SmartDashboard::PutNumber("delta", delta);
+  double currDelta = delta;
+  //Making it so you can manually set m_p and positionTotal: m_p is essential with PID, change by an order of magnitude to start run
+  double m_P = frc::SmartDashboard::GetNumber("Pd", 0.5);
+  //bool isNegative;
+  m_leftLeadMotor->GetPIDController().SetP(m_P);
+  m_rightLeadMotor->GetPIDController().SetP(m_P);
+  frc::SmartDashboard::PutNumber("Pd", m_P);
+  double waitTime = frc::SmartDashboard::GetNumber("waitTime", 4);
+  double currWait = waitTime;
+  //frc::SmartDashboard::PutNumber("waitTime", waitTime);
+  // positionTotal = frc::SmartDashboard::GetNumber("positionTotal", 6);
+  // frc::SmartDashboard::PutNumber("positionTotal", positionTotal);
+  // positionTotal = -6;
+ 
+  double currTime = frc::Timer::GetFPGATimestamp();
+  frc::SmartDashboard::PutNumber("currTime", currTime);
+  if(currTime > prevTime + currWait) {
+      m_leftLeadMotor->GetPIDController().SetReference(currDelta, rev::ControlType::kPosition);
+      currDelta = currDelta * -1.0;
+      m_rightLeadMotor->GetPIDController().SetReference(currDelta, rev::ControlType::kPosition);
+      prevTime = frc::Timer::GetFPGATimestamp();
+ 
+ 
+      frc::SmartDashboard::PutNumber("Right Encoder", m_rightEncoder.GetPosition());
+      frc::SmartDashboard::PutNumber("Left Encoder", m_leftEncoder.GetPosition());
+      frc::SmartDashboard::PutNumber("Motor Current", m_leftLeadMotor->GetOutputCurrent());
+      prevTime = frc::Timer::GetFPGATimestamp();
+      frc::SmartDashboard::PutNumber("prevTime", prevTime);
+  }
+}
+
 void Robot::AutonomousInit()
 {
 
@@ -105,55 +139,56 @@ void Robot::AutonomousPeriodic() {
   m_leftLeadMotor->GetPIDController().SetP(m_P);
   m_rightLeadMotor->GetPIDController().SetP(m_P);
 
-  positionTotal = frc::SmartDashboard::GetNumber("positionTotal", 6);
-  frc::SmartDashboard::PutNumber("positionTotal", positionTotal);
+  // positionTotal = frc::SmartDashboard::GetNumber("positionTotal", 6);
+  // frc::SmartDashboard::PutNumber("positionTotal", positionTotal);
 
-  //So the robot can move backwards in auto, if it ever needs too
-  if (positionTotal < 0) {
-    isNegative = true;
-    positionTotal = fabs(positionTotal);
-    frc::SmartDashboard::PutBoolean("isNegative", true);
-  }
+  // //So the robot can move backwards in auto, if it ever needs too
+  // if (positionTotal < 0) {
+  //   isNegative = true;
+  //   positionTotal = fabs(positionTotal);
+  //   frc::SmartDashboard::PutBoolean("isNegative", true);
+  // }
 
-  //if positionTotal was negative, this statement would never be true, and robot couldn't drive backwards 0 < -6ß
-  if (currentPosition < positionTotal) {
-    double timeElapsed = frc::Timer::GetFPGATimestamp() - prevTime;
+  // //if positionTotal was negative, this statement would never be true, and robot couldn't drive backwards 0 < -6ß
+  // if (currentPosition < positionTotal) {
+  //   double timeElapsed = frc::Timer::GetFPGATimestamp() - prevTime;
 
-    distanceToDeccelerate = (3 * currentVelocity * currentVelocity) / (2 * maxAcc);
+  //   distanceToDeccelerate = (3 * currentVelocity * currentVelocity) / (2 * maxAcc);
 
-    //If the amount of distance we have is less than distance to deccelerate, reduce velocity, by the most possible
-    if (distanceToDeccelerate > positionTotal - currentPosition) {
-      currentVelocity -= (maxAcc * timeElapsed);
-    }
-    else //increase velocity
-    {
-      currentVelocity += (maxAcc * timeElapsed);
-      if (currentVelocity > maxVelocity)
-      {
-        currentVelocity = maxVelocity;
-      }
-    }
-    //or setpoint
-    currentPosition += currentVelocity * timeElapsed;
-    if(currentPosition > positionTotal) {
-      currentPosition = positionTotal;
-    }
+  //   //If the amount of distance we have is less than distance to deccelerate, reduce velocity, by the most possible
+  //   if (distanceToDeccelerate > positionTotal - currentPosition) {
+  //     currentVelocity -= (maxAcc * timeElapsed);
+  //   }
+  //   else //increase velocity
+  //   {
+  //     currentVelocity += (maxAcc * timeElapsed);
+  //     if (currentVelocity > maxVelocity)
+  //     {
+  //       currentVelocity = maxVelocity;
+  //     }
+  //   }
+  //   //or setpoint
+  //   currentPosition += currentVelocity * timeElapsed;
+  //   if(currentPosition > positionTotal) {
+  //     currentPosition = positionTotal;
+  //   }
     
-    //0.168 is gear ratio
-    double inRots = (currentPosition * 12) / (3.14 * 5.7) * 42 * (0.168);
-    frc::SmartDashboard::PutNumber("convertedToRotsPoint", inRots);
-    //so it goes in the right direction
-    if(isNegative) {
-      m_leftLeadMotor->GetPIDController().SetReference(-inRots, rev::ControlType::kPosition);
-      m_rightLeadMotor->GetPIDController().SetReference(inRots, rev::ControlType::kPosition);
-    } else {
-      m_leftLeadMotor->GetPIDController().SetReference(inRots, rev::ControlType::kPosition);
-      m_rightLeadMotor->GetPIDController().SetReference(-inRots, rev::ControlType::kPosition);
-    }
+  //   //0.168 is gear ratio
+  //   double inRots = (currentPosition * 12) / (3.14 * 5.7) * 42 * (0.168);
+  //   frc::SmartDashboard::PutNumber("convertedToRotsPoint", inRots);
+  //   //so it goes in the right direction
+  //   if(isNegative) {
+  //     m_leftLeadMotor->GetPIDController().SetReference(-inRots, rev::ControlType::kPosition);
+  //     m_rightLeadMotor->GetPIDController().SetReference(inRots, rev::ControlType::kPosition);
+  //   } else {
+  //     m_leftLeadMotor->GetPIDController().SetReference(inRots, rev::ControlType::kPosition);
+  //     m_rightLeadMotor->GetPIDController().SetReference(-inRots, rev::ControlType::kPosition);
+  //   }
     
 
-    prevTime = frc::Timer::GetFPGATimestamp();
-  }
+  //   prevTime = frc::Timer::GetFPGATimestamp();
+  // }
+  PIDTesting();
 }
 
 void Robot::TeleopInit() {
