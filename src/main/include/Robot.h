@@ -43,6 +43,7 @@ class Robot : public frc::TimedRobot {
   double positionTotal = 6;
   //currpos
   double currentPosition;
+  double testBool = true;
 
 
 

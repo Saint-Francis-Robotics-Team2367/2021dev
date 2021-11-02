@@ -58,11 +58,10 @@ void Robot::AutonomousInit()
 }
 
 void Robot::AutonomousPeriodic() {
-  double shouldGo = frc::SmartDashboard::GetBoolean("ShouldGo", false);
-  frc::SmartDashboard::PutBoolean("ShouldGo", shouldGo);
-  if(shouldGo) {
+  if(testBool) {
     //m_robotDrive->PIDTuning(1);
     m_robotDrive->PIDDrive(3, 7, 21);
+    testBool = false;
   }
   
 }

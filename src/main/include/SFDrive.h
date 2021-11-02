@@ -27,6 +27,7 @@ class SFDrive {
   void ArcadeDrive(double joystickX, double joystickY);
   void PIDDrive(float feet, float maxAcc, float maxVelocity);
   void PIDTurn(float angle, float radius, float maxAcc, float maxVelocity);
+  void graph(double currentVelocity, double currentPosition, float time, double setpoint);
   void PIDTuning(float delta);
   void setP(double value);
   void setI(double value);

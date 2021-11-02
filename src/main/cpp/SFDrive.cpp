@@ -5,6 +5,7 @@
 #include "SFDrive.h"
 #include <math.h>
 #include <frc/Timer.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 //Maybe smart dashboard if I want, could gobal variable, h file thing too if I want (figure out)
 
 
@@ -60,7 +61,18 @@ void SFDrive::ArcadeDrive(double joystickX, double joystickY) {
   //negate here
   rightLeadMotor->Set(rightMotorOutput);
 }
-
+void SFDrive::graph(double currentVelocity, double currentPosition, float time, double setpoint) {
+    frc::SmartDashboard::PutNumber("current velocity", currentVelocity);
+    frc::SmartDashboard::PutNumber("current position", currentPosition);
+    frc::SmartDashboard::PutNumber("elapsed time", time);
+    frc::SmartDashboard::PutNumber("Right Encoder", m_rightEncoder.GetPosition());
+    frc::SmartDashboard::PutNumber("Left Encoder", m_leftEncoder.GetPosition());
+    //PID values
+    frc::SmartDashboard::PutNumber("P", leftLeadMotor->GetPIDController().GetP());
+    frc::SmartDashboard::PutNumber("I", leftLeadMotor->GetPIDController().GetI());
+    frc::SmartDashboard::PutNumber("D", leftLeadMotor->GetPIDController().GetD());
+    frc::SmartDashboard::PutNumber("IZone", leftLeadMotor->GetPIDController().GetIZone());
+}
 void SFDrive::PIDDrive(float totalFeet, float maxAcc, float maxVelocity) {
   //forward movement only *implement backwards movement with if statement if necessary
   float currentPosition, currentVelocity, timeElapsed, distanceToDeccelerate, setpoint = 0; //currentPosition is the set point
@@ -93,6 +105,7 @@ void SFDrive::PIDDrive(float totalFeet, float maxAcc, float maxVelocity) {
     leftLeadMotor->GetPIDController().SetReference(setpoint, rev::ControlType::kPosition);
     rightLeadMotor->GetPIDController().SetReference(-setpoint, rev::ControlType::kPosition);
     prevTime = frc::Timer::GetFPGATimestamp();
+    graph(currentVelocity, currentPosition, timeElapsed, setpoint);
   }
 }
 
