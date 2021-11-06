@@ -9,21 +9,21 @@
 
 void Robot::RobotInit() {
   // m_leftLeadMotor->RestoreFactoryDefaults();
-  m_rightLeadMotor->RestoreFactoryDefaults();
+  // m_rightLeadMotor->RestoreFactoryDefaults();
   // m_leftFollowMotor->RestoreFactoryDefaults();
   // m_rightFollowMotor->RestoreFactoryDefaults();
 
   // m_leftEncoder.SetPosition(0);
-  m_rightEncoder.SetPosition(0);
+  // m_rightEncoder.SetPosition(0);
 
   // m_leftLeadMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
-  m_rightLeadMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
+  // m_rightLeadMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
   // m_leftFollowMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
   // m_rightFollowMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
 
   // m_leftLeadMotor->SetInverted(true);
   // m_leftFollowMotor->Follow(*m_leftLeadMotor, false);
-  m_rightLeadMotor->SetInverted(false); 
+  // m_rightLeadMotor->SetInverted(false); 
   // m_rightFollowMotor->Follow(*m_rightLeadMotor, false);
 
   std::cout << "Robot::RobotInit filename: " << filename << std::endl;
@@ -62,7 +62,7 @@ void Robot::AutonomousPeriodic() {}
 void Robot::TeleopInit() {
   frc::Solenoid valve{0};
   // m_leftEncoder.SetPosition(0);
-  m_rightEncoder.SetPosition(0);
+  // m_rightEncoder.SetPosition(0);
   compressor = new frc::Spark(1);
   pressed_button_pressure = true;
   valve.Set(false);
@@ -121,97 +121,60 @@ void Robot::DisabledInit() {}
 void Robot::DisabledPeriodic() {}
 
 void Robot::TestInit() {
- 
-  int motorList[16];
 
   testedMotors = false;
+  for (int i; i < 16; i++) {
+    motorList.push(i);
+    std::cout << "TestInit: Motor ID: " << i << " at address " << std::endl;      
+  } 
 
 }
 void Robot::TestPeriodic() {
-  
+   
   if (testedMotors == false) {
     for (int i; i < 16; i++) {
-      rev::CANSparkMax* motorList[i] = new rev::CANSparkMax(i, rev::CANSparkMax::MotorType::kBrushless);
-      std::cout << "Motor ID: " << i << "at address " << &motorList[i] << std::endl;
-      motorList[i]->Set(0.5);
-      std::cout << "GetLastError message" << motorList[i]->GetLastError() << std::endl;;
-       if (motorList[i]->GetLastError() == rev::CANError::kCantFindFirmware){
-        delete motorList[i]; 
-        
-        std::cout << "Removed Motor ID " << i << "at address " << &motorList[i] << std::endl;
+      std::cout << "TestPeriodic: Testing Motor ID: " << motorList.front() << std::endl;
+
+      rev::CANSparkMax* motor = new rev::CANSparkMax(motorList.front(), rev::CANSparkMax::MotorType::kBrushless);
+
+      motor->Set(0.5);
+      // motorList[i]->Set(0.5);
+      if (motor->GetLastError() == rev::CANError::kCantFindFirmware){
+        std::cout << "Deleting motor with motor ID of " << motorList.front() << std::endl;
+        delete motor;
+        motorList.pop();
+      } else {
+        workingMotorList.push_back(motorList.front());
+        delete motor;
+        motorList.pop();
       }
+
+      if (motorList.empty()) {
+        std::cout << "Done iterating through list" << std::endl;
+
+        for (auto i : workingMotorList)
+          std::cout << "Working motor ID " << i << std::endl;
         
-      } 
+        std::cout << "Done printing working motorID list" << std::endl;
+
+        exit(-1);
+      }
+      //   motorList[i]= 0; 
+        
+      //   std::cout << "Removed Motor ID " << i << "at address " << &motorList[i] << std::endl;
+      // }
+        
     }
-    testedMotors = true;
-    std::cout << "Done testing motor IDs" << std::endl;
-    std::cout << "Printing list..." << std::endl;
-    for (int item : motorList) {
-      std::cout << item << " ";
-    }
-  }
-  
-  
-  left_inputSpeed = frc::SmartDashboard::GetNumber("setLeft", 0);
-  right_inputSpeed = frc::SmartDashboard::GetNumber("setRight", 0);
-
-  frc::SmartDashboard::PutNumber("setLeft", left_inputSpeed);
-  frc::SmartDashboard::PutNumber("setRight", right_inputSpeed);
-
-
-  // m_leftLeadMotor->Set(left_inputSpeed);
-  m_rightLeadMotor->Set(right_inputSpeed);
-
-   // sleep(10);
-
-  // speed_leftLead = m_leftLeadMotor->Get();
-  // frc::SmartDashboard::PutNumber("speed_leftLead", speed_leftLead);
-
-  // speed_leftFollow = m_leftFollowMotor->Get();
-  // frc::SmartDashboard::PutNumber("speed_leftFollow", speed_leftFollow);
-
-  speed_rightLead = m_rightLeadMotor->Get();
-  frc::SmartDashboard::PutNumber("speed_rightLead", speed_rightLead);
-
-  // speed_rightFollow = m_rightFollowMotor->Get();
-  // frc::SmartDashboard::PutNumber("speed_rightFollow", speed_rightFollow);
-
-  if (speed_leftLead == speed_leftFollow) {
-    leftMotor_equal = true;
-  }
-
-  if (speed_rightLead == speed_rightFollow) {
-    rightMotor_equal = true;
-  }
-
-  frc::SmartDashboard::PutBoolean("leftMotor_equal", leftMotor_equal);
-  frc::SmartDashboard::PutBoolean("rightMotor_equal", rightMotor_equal);
-
-  count++;
-  
-  /* if (count % 50 == 0) {
-    motorData.open(filename, std::ios::app); // open with append
-  
-    if (motorData) {
-      std::cout << "Robot::TestPeriodic [" << count << "] logging motor values to file" << std::endl;
-    
-      motorData << count << ",";
-      motorData << left_inputSpeed << ",";
-      motorData << right_inputSpeed << ",";
-      motorData << speed_leftLead << ",";
-      motorData << speed_leftFollow << ",";
-      motorData << speed_rightLead << ",";
-      motorData << speed_rightFollow << ",";
-      motorData << leftMotor_equal << ",";
-      motorData << rightMotor_equal << std::endl;
-    
-      motorData.close();
-
-    } else {
-      std::cout << "Robot::TestPeriodic file not found" << std::endl;
-      exit(-1);
-    }
-  } */
+  } 
+    // testedMotors = true;
+  // } else {
+  //   std::cout << "Done testing motor IDs" << std::endl;
+  //   std::cout << "Printing list..." << std::endl;
+  //   for (int i; i < 16; i++) {
+  //     std::cout << motorList[i] << " ";   
+  //   }
+  //   exit(-1);
+  // }
   
 }
 

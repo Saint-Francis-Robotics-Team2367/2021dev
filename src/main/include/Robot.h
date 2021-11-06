@@ -18,6 +18,7 @@
 #include <ctime>
 #include <list>
 #include <Error.h>
+#include <queue>
 
 class Robot : public frc::TimedRobot {
  public:
@@ -38,7 +39,7 @@ class Robot : public frc::TimedRobot {
 
   // static const int leftLeadDeviceID = 12; // 15 for 2367 // 3 for 8109
   // static const int leftFollowDeviceID = 13; // 14
-  static const int rightLeadDeviceID = 13; // 12 // 12 for 8109
+  // static const int rightLeadDeviceID = 13; // 12 // 12 for 8109
   // static const int rightFollowDeviceID = 14; // 13
 
   double left_y = 0.0;
@@ -65,6 +66,10 @@ class Robot : public frc::TimedRobot {
 
   bool testedMotors;
 
+  std::queue<int> motorList;
+
+  std::list<int> workingMotorList;
+
   std::string filename = "/home/lvuser/logdata.csv";
 
   frc::AnalogInput * analog_input = new frc::AnalogInput(1);
@@ -72,12 +77,12 @@ class Robot : public frc::TimedRobot {
   frc::Spark *compressor;
 
   // rev::CANSparkMax* m_leftLeadMotor = new rev::CANSparkMax(leftLeadDeviceID, rev::CANSparkMax::MotorType::kBrushless);
-  rev::CANSparkMax* m_rightLeadMotor = new rev::CANSparkMax(rightLeadDeviceID, rev::CANSparkMax::MotorType::kBrushless);
+  // rev::CANSparkMax* m_rightLeadMotor = new rev::CANSparkMax(rightLeadDeviceID, rev::CANSparkMax::MotorType::kBrushless);
   // rev::CANSparkMax* m_leftFollowMotor = new rev::CANSparkMax(leftFollowDeviceID, rev::CANSparkMax::MotorType::kBrushless);
   // rev::CANSparkMax* m_rightFollowMotor = new rev::CANSparkMax(rightFollowDeviceID, rev::CANSparkMax::MotorType::kBrushless);
 
   // rev::CANEncoder m_leftEncoder = m_leftLeadMotor->GetEncoder(rev::CANEncoder::EncoderType::kHallSensor, 42);
-  rev::CANEncoder m_rightEncoder = m_rightLeadMotor->GetEncoder(rev::CANEncoder::EncoderType::kHallSensor, 42);
+  // rev::CANEncoder m_rightEncoder = m_rightLeadMotor->GetEncoder(rev::CANEncoder::EncoderType::kHallSensor, 42);
 
   frc::Joystick* m_stick = new frc::Joystick{0};
 
