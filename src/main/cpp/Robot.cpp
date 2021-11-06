@@ -54,16 +54,56 @@ void Robot::AutonomousInit()
 
   m_leftEncoder.SetPositionConversionFactor(14 / 50 * (24 / 40)); //check if this works!
   m_rightEncoder.SetPositionConversionFactor(14 / 50 * (24 / 40)); 
-
+  testBool = true;
+  prevTime = frc::Timer::GetFPGATimestamp();
 }
 
 void Robot::AutonomousPeriodic() {
-  if(testBool) {
-    //m_robotDrive->PIDTuning(1);
-    m_robotDrive->PIDDrive(3, 7, 21);
-    testBool = false;
-  }
+  double radius = 0;
+  double angle = 90;
+  double endpoint = ((angle * (radius + centerToWheel))/360.0) * (2 * 3.1415);
+  //double innerChord = ((angle * (radius - centerToWheel))/360.0) * (2 * 3.1415); [don't matter, just use ratio instead]
+
+
+//never use while loops unless threading
+  if(currentPosition < endpoint){
+    timeElapsed = frc::Timer::GetFPGATimestamp() - prevTime;
+    distanceToDeccelerate = (3 * currentVelocity * currentVelocity) / (2 * maxAcc);
+    if (distanceToDeccelerate > endpoint - currentPosition) {
+      currentVelocity -= (maxAcc * timeElapsed);
+    }
+    else //increase velocity
+    {
+      currentVelocity += (maxAcc * timeElapsed);
+      if (currentVelocity > maxVelocity)
+      {
+        currentVelocity = maxVelocity;
+      }
+    }
+
+    currentPosition += currentVelocity * timeElapsed;
+    if(currentPosition > endpoint) {
+      currentPosition = endpoint;
+    }
+    //same as other
+    double innerPos = ((radius - centerToWheel)/(radius + centerToWheel)) * currentPosition;
+    double outerSetpoint = (currentPosition * 12) / (3.1415 * 5.7); // for now this is ticks (maybe rotations / gearRatio if not then)
+    double innerSetPoint = (innerPos * 12) / (3.1415 * 5.7);
+    frc::SmartDashboard::PutNumber("current velocity", currentVelocity);
+    frc::SmartDashboard::PutNumber("current position", currentPosition);
+    frc::SmartDashboard::PutNumber("outerSet", outerSetpoint);
+    frc::SmartDashboard::PutNumber("innerSet", innerSetPoint);
+    //rotations and keep the multiply 
+    //probably multiplying by gear ratio twice
+    //ask abt while loops!
+    if(currentPosition < endpoint){
+      m_leftLeadMotor->GetPIDController().SetReference(-outerSetpoint, rev::ControlType::kPosition);
+      m_rightLeadMotor->GetPIDController().SetReference(innerSetPoint, rev::ControlType::kPosition);
+    }
+     //what goes here
+    prevTime = frc::Timer::GetFPGATimestamp();
   
+}
 }
 
 void Robot::TeleopInit() {

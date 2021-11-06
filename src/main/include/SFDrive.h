@@ -12,6 +12,8 @@ class SFDrive {
   // member variables
   const double deadband = 0.08;
   const double PI = 3.14159265;
+  //an approximate, make better when real
+  const double centerToWheel = 12;
   rev::CANSparkMax* leftLeadMotor = nullptr;
   rev::CANSparkMax* rightLeadMotor = nullptr;
   rev::CANSparkMax* leftFollowMotor = nullptr;

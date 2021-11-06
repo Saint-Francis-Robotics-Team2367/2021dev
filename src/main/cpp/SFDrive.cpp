@@ -102,8 +102,8 @@ void SFDrive::PIDDrive(float totalFeet, float maxAcc, float maxVelocity) {
     //converting currentPosition to ticks? for the motor: inches / (circum) * ticks * gearboxRatio, might look at this later
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     setpoint = (currentPosition * 12) / (PI * 5.7) * 42 * (0.168); // for now this is ticks (maybe rotations / gearRatio if not then)
-    leftLeadMotor->GetPIDController().SetReference(setpoint, rev::ControlType::kPosition);
-    rightLeadMotor->GetPIDController().SetReference(-setpoint, rev::ControlType::kPosition);
+    leftLeadMotor->GetPIDController().SetReference(-setpoint, rev::ControlType::kPosition);
+    rightLeadMotor->GetPIDController().SetReference(setpoint, rev::ControlType::kPosition);
     prevTime = frc::Timer::GetFPGATimestamp();
     graph(currentVelocity, currentPosition, timeElapsed, setpoint);
   }
@@ -114,10 +114,11 @@ void SFDrive::PIDTurn(float angle, float radius, float maxAcc, float maxVelocity
   m_rightEncoder.SetPosition(0);
   float currentPosition, currentVelocity, endpoint, setpoint, timeElapsed, distanceToDeccelerate = 0; //currentPosition is the set point
   float prevTime = frc::Timer::GetFPGATimestamp();
-  endpoint = ((angle/360.0) * (2 * PI * radius));
+  endpoint = ((angle * (radius + centerToWheel))/360.0) * (2 * PI);
+  double innerChord = ((angle * (radius - centerToWheel))/360.0) * (2 * PI);
 
 
-
+//never use while loops unless threading
   while(currentPosition < endpoint){
     timeElapsed = frc::Timer::GetFPGATimestamp() - prevTime;
     distanceToDeccelerate = (3 * currentVelocity * currentVelocity) / (2 * maxAcc);
@@ -137,12 +138,18 @@ void SFDrive::PIDTurn(float angle, float radius, float maxAcc, float maxVelocity
     if(currentPosition > endpoint) {
       currentPosition = endpoint;
     }
-
-    //converting currentPosition to ticks? for the motor: inches / (circum) * ticks * gearboxRatio, might look at this later
-    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    setpoint = (currentPosition * 12) / (PI * 5.7) * 42 * (0.168); // for now this is ticks (maybe rotations / gearRatio if not then)
-    leftLeadMotor->GetPIDController().SetReference(setpoint, rev::ControlType::kPosition);
-    rightLeadMotor->GetPIDController().SetReference(0, rev::ControlType::kPosition); //what goes here
+    double innerPos = ((radius - centerToWheel)/(radius + centerToWheel)) * currentPosition;
+    double outerSetpoint = (currentPosition * 12) / (PI * 5.7) * 42 * (0.168); // for now this is ticks (maybe rotations / gearRatio if not then)
+    double innerSetPoint = (innerPos * 12) / (PI * 5.7) * 42 * (0.168);
+    frc::SmartDashboard::PutNumber("current velocity", currentVelocity);
+    frc::SmartDashboard::PutNumber("current position", currentPosition);
+    frc::SmartDashboard::PutNumber("outerSet", outerSetpoint);
+    frc::SmartDashboard::PutNumber("innerSet", innerSetPoint);
+    //rotations and keep the multiply 
+    //probably multiplying by gear ratio twice
+    
+    leftLeadMotor->GetPIDController().SetReference(-outerSetpoint, rev::ControlType::kPosition);
+    rightLeadMotor->GetPIDController().SetReference(innerSetPoint, rev::ControlType::kPosition); //what goes here
     prevTime = frc::Timer::GetFPGATimestamp();
 
     //Overall questions -> What goes in setReference second, is this right, but the robot is standing still right, 
