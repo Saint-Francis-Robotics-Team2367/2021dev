@@ -142,12 +142,10 @@ void Robot::TestPeriodic() {
       if (count % 30) {
         std::cout << "Waiting in the count..." << std::endl;
       }
-      // motorList[i]->Set(0.5);
-      // if ((motor->GetLastError() == rev::CANError::kCantFindFirmware) || (motor->GetLastError() == rev::CANError::kError)){
-      // GetFault()
-      // SetCANTimeout(0)
-      // || (motor->GetLastError() == rev::CANError::kError) 
-      if ((motor->GetFault(rev::CANSparkMax::FaultID::kMotorFault)) || (motor->GetLastError() == rev::CANError::kHALError)){
+      // for some reason GetFault() is needed for GetLastError() to catch the error - need to investigate
+      motor->GetFault(rev::CANSparkMax::FaultID::kMotorFault);
+  
+      if ((motor->GetLastError() == rev::CANError::kHALError)){
         std::cout << "Deleting motor with motor ID of " << motorList.front() << std::endl; 
         
       } else {
