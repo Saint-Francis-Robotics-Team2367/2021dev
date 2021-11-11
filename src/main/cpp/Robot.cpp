@@ -123,7 +123,7 @@ void Robot::DisabledPeriodic() {}
 void Robot::TestInit() {
 
   testedMotors = false;
-  for (int i; i < 16; i++) {
+  for (int i = 0; i < 16; i++) {
     motorList.push(i);
     std::cout << "TestInit: Motor ID: " << i << " at address " << std::endl;      
   } 
@@ -132,40 +132,59 @@ void Robot::TestInit() {
 void Robot::TestPeriodic() {
    
   if (testedMotors == false) {
-    for (int i; i < 16; i++) {
+    for (int k; k < 16; k++) {
       std::cout << "TestPeriodic: Testing Motor ID: " << motorList.front() << std::endl;
-
+  
       rev::CANSparkMax* motor = new rev::CANSparkMax(motorList.front(), rev::CANSparkMax::MotorType::kBrushless);
 
       motor->Set(0.5);
+      
+      if (count % 30) {
+        std::cout << "Waiting in the count..." << std::endl;
+      }
       // motorList[i]->Set(0.5);
-      if (motor->GetLastError() == rev::CANError::kCantFindFirmware){
-        std::cout << "Deleting motor with motor ID of " << motorList.front() << std::endl;
-        delete motor;
-        motorList.pop();
-      } else {
-        workingMotorList.push_back(motorList.front());
-        delete motor;
-        motorList.pop();
-      }
-
-      if (motorList.empty()) {
-        std::cout << "Done iterating through list" << std::endl;
-
-        for (auto i : workingMotorList)
-          std::cout << "Working motor ID " << i << std::endl;
+      // if ((motor->GetLastError() == rev::CANError::kCantFindFirmware) || (motor->GetLastError() == rev::CANError::kError)){
+      // GetFault()
+      // SetCANTimeout(0)
+      // || (motor->GetLastError() == rev::CANError::kError) 
+      if ((motor->GetFault(rev::CANSparkMax::FaultID::kMotorFault)) || (motor->GetLastError() == rev::CANError::kHALError)){
+        std::cout << "Deleting motor with motor ID of " << motorList.front() << std::endl; 
         
-        std::cout << "Done printing working motorID list" << std::endl;
-
-        exit(-1);
+      } else {
+        std::cout << "Pushing working motor ID " << motorList.front() << " to back of queue" << std::endl;
+        motorList.push(motorList.front());
+        
       }
+
+      delete motor;
+      motorList.pop();
+
+      count++;
+    }
+    std::cout << "Done iterating through queue" << std::endl;
+    
+    testedMotors = true;    
+
+    } else {
+      std::cout << "Working motor ID ";
+
+      for (int j; j < motorList.size(); j++) {
+      std::cout << motorList.front() << " ";
+
+      motorList.push(motorList.front());
+      motorList.pop();
+      }
+
+      std::cout << std::endl;
+      
+    std::cout << "Done printing working motorID list" << std::endl;
+    exit(0);
+    }
       //   motorList[i]= 0; 
         
       //   std::cout << "Removed Motor ID " << i << "at address " << &motorList[i] << std::endl;
       // }
-        
-    }
-  } 
+    
     // testedMotors = true;
   // } else {
   //   std::cout << "Done testing motor IDs" << std::endl;
