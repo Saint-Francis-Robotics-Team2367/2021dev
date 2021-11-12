@@ -121,21 +121,22 @@ void Robot::DisabledInit() {}
 void Robot::DisabledPeriodic() {}
 
 void Robot::TestInit() {
-
   testedMotors = false;
-  for (int i = 0; i < 16; i++) {
-    motorList.push(i);
-    std::cout << "TestInit: Motor ID: " << i << " at address " << std::endl;      
-  } 
 
+
+  for (int i = 0; i < 16; i++) {
+    motorList.push_back(i);
+    std::cout << "TestInit: Motor ID: " << i << std::endl;      
+  } 
+  
 }
 void Robot::TestPeriodic() {
    
   if (testedMotors == false) {
-    for (int k; k < 16; k++) {
-      std::cout << "TestPeriodic: Testing Motor ID: " << motorList.front() << std::endl;
+    for (currentID = motorList.begin(); currentID != motorList.end(); currentID++) {
+      std::cout << "TestPeriodic: Testing Motor ID: " << *currentID << std::endl;
   
-      rev::CANSparkMax* motor = new rev::CANSparkMax(motorList.front(), rev::CANSparkMax::MotorType::kBrushless);
+      rev::CANSparkMax* motor = new rev::CANSparkMax(*currentID, rev::CANSparkMax::MotorType::kBrushless);
 
       motor->Set(0.5);
       
@@ -146,16 +147,15 @@ void Robot::TestPeriodic() {
       motor->GetFault(rev::CANSparkMax::FaultID::kMotorFault);
   
       if ((motor->GetLastError() == rev::CANError::kHALError)){
-        std::cout << "Deleting motor with motor ID of " << motorList.front() << std::endl; 
+        std::cout << "Deleting motor with motor ID of " << *currentID << std::endl; 
+        currentID = motorList.erase(currentID);
         
       } else {
-        std::cout << "Pushing working motor ID " << motorList.front() << " to back of queue" << std::endl;
-        motorList.push(motorList.front());
+        std::cout << "Working motor ID " << *currentID << " is kept in list" << std::endl;
         
       }
 
       delete motor;
-      motorList.pop();
 
       count++;
     }
@@ -166,11 +166,8 @@ void Robot::TestPeriodic() {
     } else {
       std::cout << "Working motor ID ";
 
-      for (int j; j < motorList.size(); j++) {
-      std::cout << motorList.front() << " ";
-
-      motorList.push(motorList.front());
-      motorList.pop();
+      for (auto &j : motorList) {
+      std::cout << j << " ";
       }
 
       std::cout << std::endl;

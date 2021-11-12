@@ -66,9 +66,9 @@ class Robot : public frc::TimedRobot {
 
   bool testedMotors;
 
-  std::queue<int> motorList;
+  std::list<int> motorList;
+  std::list<int>::iterator currentID;
 
-  std::list<int> workingMotorList;
 
   std::string filename = "/home/lvuser/logdata.csv";
 
