@@ -59,6 +59,6 @@ class Robot : public frc::TimedRobot {
 
   // SFDrive* m_robotDrive = new SFDrive(m_leftLeadMotor, m_rightLeadMotor);
 
-  frc::Ultrasonic ultrasonic{1, 2};
+  frc::Ultrasonic ultrasonic{0, 1};
 
 };
