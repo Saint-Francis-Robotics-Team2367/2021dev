@@ -23,12 +23,14 @@ void Robot::RobotPeriodic()
 {
   //frc::SmartDashboard::PutNumber("x", stick->GetRawAxis(4));
   //frc::SmartDashboard::PutNumber("y ", -stick->GetRawAxis(1));
+  // frc::SmartDashboard::PutNumber("current velocity", currentVelocity);
+  // //frc::SmartDashboard::PutNumber("current position", currentPosition);
+   frc::SmartDashboard::PutNumber("Right Encoder", m_rightEncoder.GetPosition());
+   frc::SmartDashboard::PutNumber("Left Encoder", m_leftEncoder.GetPosition());
+  // frc::SmartDashboard::PutNumber("current velocity", currentVelocity);
+  // frc::SmartDashboard::PutNumber("Conversion", Robot::convertDistanceToTicks(1));
   frc::SmartDashboard::PutNumber("current velocity", currentVelocity);
-  //frc::SmartDashboard::PutNumber("current position", currentPosition);
-  frc::SmartDashboard::PutNumber("Right Encoder", m_rightEncoder.GetPosition());
-  frc::SmartDashboard::PutNumber("Left Encoder", m_leftEncoder.GetPosition());
-  frc::SmartDashboard::PutNumber("current velocity", currentVelocity);
-  frc::SmartDashboard::PutNumber("Conversion", Robot::convertDistanceToTicks(1));
+    frc::SmartDashboard::PutNumber("current position", currentPosition);
   //frc::SmartDashboard::PutNumber("current position", currentPosition);
 }
 
@@ -52,10 +54,12 @@ void Robot::AutonomousInit()
   m_leftEncoder.SetPosition(0);
   m_rightEncoder.SetPosition(0);
 
-  m_leftEncoder.SetPositionConversionFactor(14 / 50 * (24 / 40)); //check if this works!
-  m_rightEncoder.SetPositionConversionFactor(14 / 50 * (24 / 40)); 
+  m_leftEncoder.SetPositionConversionFactor(0.168); //check if this works!
+  m_rightEncoder.SetPositionConversionFactor(0.168); 
   testBool = true;
   prevTime = frc::Timer::GetFPGATimestamp();
+  currentPosition = 0;
+  currentVelocity = 0;
 }
 
 void Robot::AutonomousPeriodic() {
@@ -66,6 +70,7 @@ void Robot::AutonomousPeriodic() {
 
 
 //never use while loops unless threading
+/**
   if(currentPosition < endpoint){
     timeElapsed = frc::Timer::GetFPGATimestamp() - prevTime;
     distanceToDeccelerate = (3 * currentVelocity * currentVelocity) / (2 * maxAcc);
@@ -89,8 +94,7 @@ void Robot::AutonomousPeriodic() {
     double innerPos = ((radius - centerToWheel)/(radius + centerToWheel)) * currentPosition;
     double outerSetpoint = (currentPosition * 12) / (3.1415 * 5.7); // for now this is ticks (maybe rotations / gearRatio if not then)
     double innerSetPoint = (innerPos * 12) / (3.1415 * 5.7);
-    frc::SmartDashboard::PutNumber("current velocity", currentVelocity);
-    frc::SmartDashboard::PutNumber("current position", currentPosition);
+    
     frc::SmartDashboard::PutNumber("outerSet", outerSetpoint);
     frc::SmartDashboard::PutNumber("innerSet", innerSetPoint);
     //rotations and keep the multiply 
@@ -103,6 +107,13 @@ void Robot::AutonomousPeriodic() {
      //what goes here
     prevTime = frc::Timer::GetFPGATimestamp();
   
+}
+**/
+if(testBool) {
+  testBool = false;
+  m_leftLeadMotor->GetPIDController().SetReference(12.0 / (3.145 * 5.7), rev::ControlType::kPosition);
+  m_rightLeadMotor->GetPIDController().SetReference(-12.0 / (3.145 * 5.7), rev::ControlType::kPosition);
+  frc::SmartDashboard::PutNumber("conversion", -12.0 / (3.145 * 5.7));
 }
 }
 
