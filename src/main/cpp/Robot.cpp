@@ -6,20 +6,18 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 
 void Robot::RobotInit() {
-  // m_leftLeadMotor->RestoreFactoryDefaults();
+  m_leftLeadMotor->RestoreFactoryDefaults();
   m_rightLeadMotor->RestoreFactoryDefaults();
-  // m_leftFollowMotor->RestoreFactoryDefaults();
-  // m_rightFollowMotor->RestoreFactoryDefaults();
+  m_leftFollowMotor->RestoreFactoryDefaults();
+  m_rightFollowMotor->RestoreFactoryDefaults();
 
-  // m_leftEncoder.SetPosition(0);
+  m_leftEncoder.SetPosition(0);
   m_rightEncoder.SetPosition(0);
 
-  // m_leftLeadMotor->SetInverted(true);
-  // m_leftFollowMotor->Follow(*m_leftLeadMotor, false);
+  m_leftLeadMotor->SetInverted(true);
+  m_leftFollowMotor->Follow(*m_leftLeadMotor, false);
   m_rightLeadMotor->SetInverted(false);
-  // m_rightFollowMotor->Follow(*m_rightLeadMotor, false);
-
-  ultrasonic.SetAutomaticMode(true);
+  m_rightFollowMotor->Follow(*m_rightLeadMotor, false);
 }
 void Robot::RobotPeriodic() {
   frc::SmartDashboard::PutNumber("left y: ", -(m_stick->GetRawAxis(1)));
@@ -30,21 +28,19 @@ void Robot::AutonomousInit() {}
 void Robot::AutonomousPeriodic() {}
 
 void Robot::TeleopInit() {
-  // m_leftEncoder.SetPosition(0);
-  // m_rightEncoder.SetPosition(0);
-  // compressor = new frc::Spark(1);
+  m_leftEncoder.SetPosition(0);
+  m_rightEncoder.SetPosition(0);
+  compressor = new frc::Spark(1);
   pressed_button_pressure = true;
-  // valve.Set(false);
+  valve.Set(false);
 }
 void Robot::TeleopPeriodic() {
-  frc::SmartDashboard::PutNumber("Ultrasonic Distance(IN): ", ultrasonic.GetRangeInches());
-
   left_y = m_stick->GetRawAxis(1);
   right_x = m_stick->GetRawAxis(4);
 
-  // m_robotDrive->ArcadeDrive(-left_y, right_x);
+  m_robotDrive->ArcadeDrive(-left_y, right_x);
 
-  // analog_input->GetVoltage();
+  analog_input->GetVoltage();
   frc::SmartDashboard::PutNumber("analogInput", analog_input->GetVoltage());
 
   var_input = frc::SmartDashboard::GetNumber("varInput", 1);
@@ -55,7 +51,7 @@ void Robot::TeleopPeriodic() {
 
   PSI = (analog_input->GetVoltage()) * 100 + 10; // transfer function
   if (m_stick->GetRawButtonPressed(1)) {
-    // valve.Set(false);
+    valve.Set(false);
     pressed_button_pressure = true;
     reached_max_pressure = false;
     frc::SmartDashboard::PutBoolean("triggerpress", true);
@@ -63,21 +59,21 @@ void Robot::TeleopPeriodic() {
   }
 
   if ((m_stick->GetRawButtonPressed(2)) && (reached_max_pressure)) {
-    // valve.Set(true);
+    valve.Set(true);
     frc::SmartDashboard::PutBoolean("valve", true);
   }
 
   if (m_stick->GetRawButtonPressed(3)) {
-    // valve.Set(false);
+    valve.Set(false);
     frc::SmartDashboard::PutBoolean("valve", false);
   }
 
   if ((!reached_max_pressure) && (pressed_button_pressure)) {
     if (PSI < maxPSI) {
       frc::SmartDashboard::PutNumber("currPSI", PSI);
-      // compressor->Set(1);
+      compressor->Set(1);
     } else {
-      // compressor->Set(0);
+      compressor->Set(0);
       reached_max_pressure = true;
       pressed_button_pressure = false; 
       frc::SmartDashboard::PutBoolean("triggerpress", false);
