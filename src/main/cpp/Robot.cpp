@@ -26,17 +26,17 @@ void Robot::RobotInit() {
   // m_rightLeadMotor->SetInverted(false); 
   // m_rightFollowMotor->Follow(*m_rightLeadMotor, false);
 
-  std::cout << "Robot::RobotInit filename: " << filename << std::endl;
-  motorData.open(filename);
+  // std::cout << "Robot::RobotInit filename: " << filename << std::endl;
+  // motorData.open(filename);
   
-  if (motorData) {
-    motorData << "count,left_input_speed,right_input_speed,speed_left_lead,speed_left_follow,speed_right_lead,speed_right_follow,left_motor_equal,right_motor_equal" << std::endl;
-    std::cout << "Robot::RobotInit: wrote headers in file" << std::endl;
+  // if (motorData) {
+  //   motorData << "count,left_input_speed,right_input_speed,speed_left_lead,speed_left_follow,speed_right_lead,speed_right_follow,left_motor_equal,right_motor_equal" << std::endl;
+  //   std::cout << "Robot::RobotInit: wrote headers in file" << std::endl;
     
-    motorData.close();
-  } else {
-    std::cout << "Robot::RobotInit: unable to open file " << filename << std::endl;
-  }
+  //   motorData.close();
+  // } else {
+  //   std::cout << "Robot::RobotInit: unable to open file " << filename << std::endl;
+  // }
 }
 void Robot::RobotPeriodic() {
   frc::SmartDashboard::PutNumber("left y: ", -(m_stick->GetRawAxis(1)));
@@ -122,9 +122,9 @@ void Robot::DisabledPeriodic() {}
 
 void Robot::TestInit() {
   testedMotors = false;
+  count = 0;
 
-
-  for (int i = 0; i < 16; i++) {
+  for (int i = 0; i < maxNumIDs; i++) {
     motorList.push_back(i);
     std::cout << "TestInit: Motor ID: " << i << std::endl;      
   } 
@@ -139,16 +139,14 @@ void Robot::TestPeriodic() {
       rev::CANSparkMax* motor = new rev::CANSparkMax(*currentID, rev::CANSparkMax::MotorType::kBrushless);
 
       motor->Set(0.5);
-      
-      if (count % 30) {
-        std::cout << "Waiting in the count..." << std::endl;
-      }
+    
       // for some reason GetFault() is needed for GetLastError() to catch the error - need to investigate
       motor->GetFault(rev::CANSparkMax::FaultID::kMotorFault);
   
       if ((motor->GetLastError() == rev::CANError::kHALError)){
         std::cout << "Deleting motor with motor ID of " << *currentID << std::endl; 
         currentID = motorList.erase(currentID);
+        currentID--;
         
       } else {
         std::cout << "Working motor ID " << *currentID << " is kept in list" << std::endl;
@@ -156,8 +154,7 @@ void Robot::TestPeriodic() {
       }
 
       delete motor;
-
-      count++;
+    
     }
     std::cout << "Done iterating through queue" << std::endl;
     
@@ -175,20 +172,6 @@ void Robot::TestPeriodic() {
     std::cout << "Done printing working motorID list" << std::endl;
     exit(0);
     }
-      //   motorList[i]= 0; 
-        
-      //   std::cout << "Removed Motor ID " << i << "at address " << &motorList[i] << std::endl;
-      // }
-    
-    // testedMotors = true;
-  // } else {
-  //   std::cout << "Done testing motor IDs" << std::endl;
-  //   std::cout << "Printing list..." << std::endl;
-  //   for (int i; i < 16; i++) {
-  //     std::cout << motorList[i] << " ";   
-  //   }
-  //   exit(-1);
-  // }
   
 }
 

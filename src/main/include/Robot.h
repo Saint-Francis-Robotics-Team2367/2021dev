@@ -66,6 +66,8 @@ class Robot : public frc::TimedRobot {
 
   bool testedMotors;
 
+  const int maxNumIDs = 17;
+
   std::list<int> motorList;
   std::list<int>::iterator currentID;
 
@@ -90,5 +92,5 @@ class Robot : public frc::TimedRobot {
 
   // frc::Solenoid valve{0};
 
-  std::ofstream motorData;
+  // std::ofstream motorData;
 };
