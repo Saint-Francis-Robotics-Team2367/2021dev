@@ -45,7 +45,7 @@ class Robot : public frc::TimedRobot {
   double currentPosition;
   double testBool = true;
   double timeElapsed = 0;
-  double centerToWheel = 12;
+  double centerToWheel = 1.04; //in feet
 
 
 

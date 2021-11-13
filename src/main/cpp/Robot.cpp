@@ -39,7 +39,7 @@ void Robot::AutonomousInit()
 {
   //maybe init all in the constructor
   //PID tuned values for t-shirt cannon, having init here instead of SFDrive, might change later
-  double m_P = 0.23, m_I = 0.04, m_D = 1.68, iZone = 0.04;
+  double m_P = 0.20, m_I = 0.04, m_D = 1.60, iZone = 0.04;
 
   m_leftLeadMotor->GetPIDController().SetP(m_P);
   m_leftLeadMotor->GetPIDController().SetI(m_I);
@@ -63,14 +63,14 @@ void Robot::AutonomousInit()
 }
 
 void Robot::AutonomousPeriodic() {
-  double radius = 0;
-  double angle = 90;
-  double endpoint = ((angle * (radius + centerToWheel))/360.0) * (2 * 3.1415);
+  double radius = 3;
+  double angle = 60;
+  double endpoint = (angle / 360.0) * (radius + centerToWheel) * (2 * 3.1415);
+  frc::SmartDashboard::PutNumber("endpoint", endpoint);
   //double innerChord = ((angle * (radius - centerToWheel))/360.0) * (2 * 3.1415); [don't matter, just use ratio instead]
 
 
 //never use while loops unless threading
-/**
   if(currentPosition < endpoint){
     timeElapsed = frc::Timer::GetFPGATimestamp() - prevTime;
     distanceToDeccelerate = (3 * currentVelocity * currentVelocity) / (2 * maxAcc);
@@ -91,30 +91,30 @@ void Robot::AutonomousPeriodic() {
       currentPosition = endpoint;
     }
     //same as other
-    double innerPos = ((radius - centerToWheel)/(radius + centerToWheel)) * currentPosition;
+   
     double outerSetpoint = (currentPosition * 12) / (3.1415 * 5.7); // for now this is ticks (maybe rotations / gearRatio if not then)
-    double innerSetPoint = (innerPos * 12) / (3.1415 * 5.7);
+    double innerSetpoint = ((radius - centerToWheel)/(radius + centerToWheel)) * outerSetpoint;
     
     frc::SmartDashboard::PutNumber("outerSet", outerSetpoint);
-    frc::SmartDashboard::PutNumber("innerSet", innerSetPoint);
+    frc::SmartDashboard::PutNumber("innerSet", innerSetpoint);
     //rotations and keep the multiply 
     //probably multiplying by gear ratio twice
     //ask abt while loops!
     if(currentPosition < endpoint){
       m_leftLeadMotor->GetPIDController().SetReference(-outerSetpoint, rev::ControlType::kPosition);
-      m_rightLeadMotor->GetPIDController().SetReference(innerSetPoint, rev::ControlType::kPosition);
+      m_rightLeadMotor->GetPIDController().SetReference(innerSetpoint, rev::ControlType::kPosition);
     }
      //what goes here
     prevTime = frc::Timer::GetFPGATimestamp();
   
 }
-**/
-if(testBool) {
+
+/**if(testBool) {
   testBool = false;
   m_leftLeadMotor->GetPIDController().SetReference(12.0 / (3.145 * 5.7), rev::ControlType::kPosition);
   m_rightLeadMotor->GetPIDController().SetReference(-12.0 / (3.145 * 5.7), rev::ControlType::kPosition);
   frc::SmartDashboard::PutNumber("conversion", -12.0 / (3.145 * 5.7));
-}
+} **/
 }
 
 void Robot::TeleopInit() {
