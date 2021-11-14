@@ -13,7 +13,7 @@ class SFDrive {
   const double deadband = 0.08;
   const double PI = 3.14159265;
   //an approximate, make better when real
-  const double centerToWheel = 12;
+  const double centerToWheel = 1.04;
   rev::CANSparkMax* leftLeadMotor = nullptr;
   rev::CANSparkMax* rightLeadMotor = nullptr;
   rev::CANSparkMax* leftFollowMotor = nullptr;
@@ -21,6 +21,7 @@ class SFDrive {
   //works ig?
   rev::CANEncoder m_leftEncoder = leftLeadMotor->GetEncoder(rev::CANEncoder::EncoderType::kHallSensor, 42);
   rev::CANEncoder m_rightEncoder = rightLeadMotor->GetEncoder(rev::CANEncoder::EncoderType::kHallSensor, 42);
+
   //Set a conversion factor
   // constructor
   SFDrive(rev::CANSparkMax* leftLeadMotor, rev::CANSparkMax* rightLeadMotor, rev::CANSparkMax* leftFollowMotor, rev::CANSparkMax* rightFollowMotor);

@@ -79,6 +79,8 @@ void SFDrive::PIDDrive(float totalFeet, float maxAcc, float maxVelocity) {
   float prevTime = frc::Timer::GetFPGATimestamp();
   m_leftEncoder.SetPosition(0);
   m_rightEncoder.SetPosition(0);
+  m_leftEncoder.SetPositionConversionFactor(0.168); //check if this works!
+  m_rightEncoder.SetPositionConversionFactor(0.168); 
   while(currentPosition < totalFeet){
     timeElapsed = frc::Timer::GetFPGATimestamp() - prevTime;
     distanceToDeccelerate = (3 * currentVelocity * currentVelocity) / (2 * maxAcc);
@@ -112,10 +114,13 @@ void SFDrive::PIDDrive(float totalFeet, float maxAcc, float maxVelocity) {
 void SFDrive::PIDTurn(float angle, float radius, float maxAcc, float maxVelocity) {
   m_leftEncoder.SetPosition(0);
   m_rightEncoder.SetPosition(0);
+  m_leftEncoder.SetPositionConversionFactor(0.168); //check if this works!
+  m_rightEncoder.SetPositionConversionFactor(0.168); 
+
   float currentPosition, currentVelocity, endpoint, setpoint, timeElapsed, distanceToDeccelerate = 0; //currentPosition is the set point
   float prevTime = frc::Timer::GetFPGATimestamp();
-  endpoint = ((angle * (radius + centerToWheel))/360.0) * (2 * PI);
-  double innerChord = ((angle * (radius - centerToWheel))/360.0) * (2 * PI);
+  endpoint = (angle / 360.0) * (radius + centerToWheel) * (2 * 3.1415);
+  frc::SmartDashboard::PutNumber("endpoint", endpoint);
 
 
 //never use while loops unless threading
@@ -138,27 +143,20 @@ void SFDrive::PIDTurn(float angle, float radius, float maxAcc, float maxVelocity
     if(currentPosition > endpoint) {
       currentPosition = endpoint;
     }
-    double innerPos = ((radius - centerToWheel)/(radius + centerToWheel)) * currentPosition;
-    double outerSetpoint = (currentPosition * 12) / (PI * 5.7) * 42 * (0.168); // for now this is ticks (maybe rotations / gearRatio if not then)
-    double innerSetPoint = (innerPos * 12) / (PI * 5.7) * 42 * (0.168);
-    frc::SmartDashboard::PutNumber("current velocity", currentVelocity);
-    frc::SmartDashboard::PutNumber("current position", currentPosition);
-    frc::SmartDashboard::PutNumber("outerSet", outerSetpoint);
-    frc::SmartDashboard::PutNumber("innerSet", innerSetPoint);
-    //rotations and keep the multiply 
-    //probably multiplying by gear ratio twice
+    //same as other
+   
+    double outerSetpoint = (currentPosition * 12) / (PI * 5.7); // for now this is ticks (maybe rotations / gearRatio if not then)
+    double innerSetpoint = ((radius - centerToWheel)/(radius + centerToWheel)) * outerSetpoint;
     
-    leftLeadMotor->GetPIDController().SetReference(-outerSetpoint, rev::ControlType::kPosition);
-    rightLeadMotor->GetPIDController().SetReference(innerSetPoint, rev::ControlType::kPosition); //what goes here
-    prevTime = frc::Timer::GetFPGATimestamp();
+    frc::SmartDashboard::PutNumber("outerSet", outerSetpoint);
+    frc::SmartDashboard::PutNumber("innerSet", innerSetpoint);
 
-    //Overall questions -> What goes in setReference second, is this right, but the robot is standing still right, 
-    //so during path planning we call PID turning to move a certain angle, but it won't turn in place?, how do we want it to turn
-    //because we have different radius's so the angle turns a different distance each time along the circle, is that what we're trying
-    //not just in place
-    //ask on saturday ig
+    if(currentPosition < endpoint){
+      leftLeadMotor->GetPIDController().SetReference(-outerSetpoint, rev::ControlType::kPosition);
+      rightLeadMotor->GetPIDController().SetReference(innerSetpoint, rev::ControlType::kPosition);
+    }
+    prevTime = frc::Timer::GetFPGATimestamp();
   }
-  //we should have some inner set point though right?
 }
 
 

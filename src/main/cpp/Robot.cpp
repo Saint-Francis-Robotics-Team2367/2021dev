@@ -39,7 +39,7 @@ void Robot::AutonomousInit()
 {
   //maybe init all in the constructor
   //PID tuned values for t-shirt cannon, having init here instead of SFDrive, might change later
-  double m_P = 0.20, m_I = 0.04, m_D = 1.60, iZone = 0.04;
+  double m_P = 0.23, m_I = 0.04, m_D = 1.68, iZone = 0.04;
 
   m_leftLeadMotor->GetPIDController().SetP(m_P);
   m_leftLeadMotor->GetPIDController().SetI(m_I);
