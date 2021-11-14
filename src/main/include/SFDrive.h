@@ -22,18 +22,29 @@ class SFDrive {
   rev::CANEncoder m_leftEncoder = leftLeadMotor->GetEncoder(rev::CANEncoder::EncoderType::kHallSensor, 42);
   rev::CANEncoder m_rightEncoder = rightLeadMotor->GetEncoder(rev::CANEncoder::EncoderType::kHallSensor, 42);
 
+  //looked at the way they did it in the passed, they only have one thread variable at a time, ig that's all we need, but should I make more somehow?
+  std::thread * thread = nullptr;
+  bool stopThread = false;
+  bool threadFinished = true;
+
   //Set a conversion factor
   // constructor
   SFDrive(rev::CANSparkMax* leftLeadMotor, rev::CANSparkMax* rightLeadMotor, rev::CANSparkMax* leftFollowMotor, rev::CANSparkMax* rightFollowMotor);
+
   
  public:
   // methods
   void ArcadeDrive(double joystickX, double joystickY);
-  void PIDDrive(float feet, float maxAcc, float maxVelocity);
-  void PIDTurn(float angle, float radius, float maxAcc, float maxVelocity);
+  bool PIDDrive(float feet, float maxAcc, float maxVelocity);
+  bool PIDDriveThread(float feet, float maxAcc, float maxVelocity);
+  bool PIDTurn(float angle, float radius, float maxAcc, float maxVelocity);
+  bool PIDTurnThread(float angle, float radius, float maxAcc, float maxVelocity);
   void graph(double currentVelocity, double currentPosition, float time, double setpoint);
   void PIDTuning(float delta);
   void setP(double value);
   void setI(double value);
   void setD(double value);
+  void joinAutoThread();
+  void stopAutoThread();
+
 };

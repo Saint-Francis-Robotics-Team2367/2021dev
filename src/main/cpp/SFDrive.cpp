@@ -73,7 +73,7 @@ void SFDrive::graph(double currentVelocity, double currentPosition, float time, 
     frc::SmartDashboard::PutNumber("D", leftLeadMotor->GetPIDController().GetD());
     frc::SmartDashboard::PutNumber("IZone", leftLeadMotor->GetPIDController().GetIZone());
 }
-void SFDrive::PIDDrive(float totalFeet, float maxAcc, float maxVelocity) {
+bool SFDrive::PIDDrive(float totalFeet, float maxAcc, float maxVelocity) {
   //forward movement only *implement backwards movement with if statement if necessary
   float currentPosition, currentVelocity, timeElapsed, distanceToDeccelerate, setpoint = 0; //currentPosition is the set point
   float prevTime = frc::Timer::GetFPGATimestamp();
@@ -82,6 +82,11 @@ void SFDrive::PIDDrive(float totalFeet, float maxAcc, float maxVelocity) {
   m_leftEncoder.SetPositionConversionFactor(0.168); //check if this works!
   m_rightEncoder.SetPositionConversionFactor(0.168); 
   while(currentPosition < totalFeet){
+    if(stopThread) //STOP THE DANG THREAD
+    {
+      stopThread = false;
+      break;
+    }
     timeElapsed = frc::Timer::GetFPGATimestamp() - prevTime;
     distanceToDeccelerate = (3 * currentVelocity * currentVelocity) / (2 * maxAcc);
     if (distanceToDeccelerate > totalFeet - currentPosition) {
@@ -109,9 +114,31 @@ void SFDrive::PIDDrive(float totalFeet, float maxAcc, float maxVelocity) {
     prevTime = frc::Timer::GetFPGATimestamp();
     graph(currentVelocity, currentPosition, timeElapsed, setpoint);
   }
+  threadFinished = true; //threadFinished will change the variable, and change will be passed on on the reference
+  return true;
 }
 
-void SFDrive::PIDTurn(float angle, float radius, float maxAcc, float maxVelocity) {
+bool SFDrive::PIDDriveThread(float feet, float maxAcc, float maxVelocity) {
+  stopThread = false; 
+   if(thread == nullptr) //If there's no thread, make one
+   {
+      threadFinished = false;
+      //arguments of thread
+      thread = new std::thread(&SFDrive::PIDDrive, this, feet, maxAcc, maxVelocity); //passing as a reference, so when it changes, main thing changes
+      return true;
+   }
+   if(threadFinished) //If there is a thread but it's done, delete it and make another one
+   {
+      threadFinished = false;
+      joinAutoThread();
+      delete thread;
+      thread = new std::thread(&SFDrive::PIDDrive, this, feet, maxAcc, maxVelocity);
+      return true;
+   }
+   return false; //If thread already executing, do nothing
+}
+
+bool SFDrive::PIDTurn(float angle, float radius, float maxAcc, float maxVelocity) {
   m_leftEncoder.SetPosition(0);
   m_rightEncoder.SetPosition(0);
   m_leftEncoder.SetPositionConversionFactor(0.168); //check if this works!
@@ -119,12 +146,17 @@ void SFDrive::PIDTurn(float angle, float radius, float maxAcc, float maxVelocity
 
   float currentPosition, currentVelocity, endpoint, setpoint, timeElapsed, distanceToDeccelerate = 0; //currentPosition is the set point
   float prevTime = frc::Timer::GetFPGATimestamp();
-  endpoint = (angle / 360.0) * (radius + centerToWheel) * (2 * 3.1415);
+  endpoint = (angle / 360.0) * (radius + centerToWheel) * (2 * PI);
   frc::SmartDashboard::PutNumber("endpoint", endpoint);
 
 
 //never use while loops unless threading
   while(currentPosition < endpoint){
+    if(stopThread) //STOP THE DANG THREAD
+    {
+      stopThread = false;
+      break;
+    }
     timeElapsed = frc::Timer::GetFPGATimestamp() - prevTime;
     distanceToDeccelerate = (3 * currentVelocity * currentVelocity) / (2 * maxAcc);
     if (distanceToDeccelerate > endpoint - currentPosition) {
@@ -157,7 +189,28 @@ void SFDrive::PIDTurn(float angle, float radius, float maxAcc, float maxVelocity
     }
     prevTime = frc::Timer::GetFPGATimestamp();
   }
+  threadFinished = true; //threadFinished will change the variable, and change will be passed on on the reference
+  return true;
 }
+
+bool SFDrive::PIDTurnThread(float angle, float radius, float maxAcc, float maxVel){
+   stopThread = false;
+   if(thread == nullptr) //If there's no thread, make one
+   {
+      thread = new std::thread(&SFDrive::PIDTurn, this, angle, radius, maxVel); //mass in references/iterables, then params
+      return true;
+   }
+   if(threadFinished) //If there is a thread but it's done, delete it and make another one
+   {
+      threadFinished = false;
+      joinAutoThread();
+      delete thread;
+      thread = new std::thread(&SFDrive::PIDTurn, this, angle, radius, maxVel); //mass in references/iterables, then params
+      return true;
+   }
+   return false; //If thread already executing, do nothing
+}
+
 
 
 
@@ -234,4 +287,20 @@ void SFDrive::setD(double value)
 {
     leftLeadMotor->GetPIDController().SetD(value);
     rightLeadMotor->GetPIDController().SetD(value);
+}
+void SFDrive::stopAutoThread()
+{
+  //??
+   stopThread = true;
+   joinAutoThread();
+   stopThread = false;
+}
+
+void SFDrive::joinAutoThread()
+{
+   if(thread == nullptr || !thread->joinable())
+   {
+      return;
+   }
+   thread->join();
 }
