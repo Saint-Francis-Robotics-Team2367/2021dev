@@ -129,7 +129,9 @@ void Robot::TeleopPeriodic()
   m_robotDrive->ArcadeDrive(joystickX, joystickY);
 }
 
-void Robot::DisabledInit() {}
+void Robot::DisabledInit() {
+  m_robotDrive->stopAutoThread(); //yeah
+}
 
 void Robot::DisabledPeriodic() {}
 
