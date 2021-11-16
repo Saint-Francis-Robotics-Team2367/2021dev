@@ -19,6 +19,7 @@
 #include <list>
 #include <Error.h>
 #include <queue>
+#include <frc/DriverStation.h>
 
 class Robot : public frc::TimedRobot {
  public:
@@ -36,6 +37,8 @@ class Robot : public frc::TimedRobot {
 
   void TestInit() override;
   void TestPeriodic() override;
+
+  void checkMotorIDs();
 
   // static const int leftLeadDeviceID = 12; // 15 for 2367 // 3 for 8109
   // static const int leftFollowDeviceID = 13; // 14
@@ -62,18 +65,6 @@ class Robot : public frc::TimedRobot {
   bool leftMotor_equal;
   bool rightMotor_equal;
 
-  int count;
-
-  bool testedMotors;
-
-  const int maxNumIDs = 17;
-
-  std::list<int> motorList;
-  std::list<int>::iterator currentID;
-
-
-  std::string filename = "/home/lvuser/logdata.csv";
-
   frc::AnalogInput * analog_input = new frc::AnalogInput(1);
 
   frc::Spark *compressor;
@@ -93,4 +84,62 @@ class Robot : public frc::TimedRobot {
   // frc::Solenoid valve{0};
 
   // std::ofstream motorData;
+
+  
 };
+
+void Robot::checkMotorIDs(){
+  int count = 0;
+  bool testedMotors = false;
+  const int maxNumIDs = 16;
+  std::string workingMotorIDString = "Working Motor IDs: ";
+  std::list<int> motorList;
+  std::list<int>::iterator currentID;
+
+    for (int i = 0; i < maxNumIDs; i++) {
+      motorList.push_back(i);
+      std::cout << "TestInit: Motor ID: " << i << std::endl;      
+    } 
+
+    if (testedMotors == false) {
+      for (currentID = motorList.begin(); currentID != motorList.end(); currentID++) {
+        std::cout << "TestPeriodic: Testing Motor ID: " << *currentID << std::endl;
+    
+        rev::CANSparkMax* motor = new rev::CANSparkMax(*currentID, rev::CANSparkMax::MotorType::kBrushless);
+
+        motor->Set(0.5);
+      
+        // for some reason GetFault() is needed for GetLastError() to catch the error - need to investigate
+        motor->GetFault(rev::CANSparkMax::FaultID::kMotorFault);
+    
+        if ((motor->GetLastError() == rev::CANError::kHALError)){
+          std::cout << "Deleting motor with motor ID of " << *currentID << std::endl; 
+          currentID = motorList.erase(currentID);
+          currentID--;
+          
+        } else {
+          std::cout << "Working motor ID " << *currentID << " is kept in list" << std::endl;
+          motor->Set(0);
+        }
+
+        delete motor;
+      
+      }
+      std::cout << "Done iterating through queue" << std::endl;
+      
+      testedMotors = true;    
+
+    } else {
+      std::cout << "Working motor ID ";
+
+      for (auto &j : motorList) {
+      std::cout << j << " ";
+      workingMotorIDString += j + " ";
+      }
+
+      frc::DriverStation::ReportError(workingMotorIDString);
+      std::cout << std::endl;
+      
+      std::cout << "Done printing working motorID list" << std::endl;
+    }
+  }
