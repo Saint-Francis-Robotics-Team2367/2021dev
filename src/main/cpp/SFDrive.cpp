@@ -6,7 +6,8 @@
 #include <math.h>
 #include <frc/Timer.h>
 #include <frc/smartdashboard/SmartDashboard.h>
-//Maybe smart dashboard if I want, could gobal variable, h file thing too if I want (figure out)
+//get a mutex vairable
+
 
 
 //Review class construction*
@@ -119,6 +120,7 @@ bool SFDrive::PIDDrive(float totalFeet, float maxAcc, float maxVelocity) {
 }
 
 bool SFDrive::PIDDriveThread(float feet, float maxAcc, float maxVelocity) {
+  //Do you want me to delete the threads when all is done?
   stopThread = false; 
    if(thread == nullptr) //If there's no thread, make one
    {
@@ -131,6 +133,7 @@ bool SFDrive::PIDDriveThread(float feet, float maxAcc, float maxVelocity) {
    {
       threadFinished = false;
       joinAutoThread();
+      //A thread is safe to destroy after a join has been called, then delete it, though it should have been called huh
       delete thread;
       thread = new std::thread(&SFDrive::PIDDrive, this, feet, maxAcc, maxVelocity);
       return true;
@@ -211,7 +214,23 @@ bool SFDrive::PIDTurnThread(float angle, float radius, float maxAcc, float maxVe
    return false; //If thread already executing, do nothing
 }
 
+bool SFDrive::OptimizedMovement(float currx, float curry, float endx, float endy) {
+  //with no obstacle in the way
+  float straightLineDistance = sqrt(pow((endx - currx), 2) + (pow((endy - curry), 2))); //distance formula
+  float angle = atan((endy - curry)/(endx - currx));
 
+  if(PIDTurnThread(angle, 0, 7, 21)) {
+    joinAutoThread();
+    if(PIDDriveThread(straightLineDistance, 7, 21)) {
+      joinAutoThread();
+    }
+  }
+
+  //if obstacle
+  // turn around the obstacle, using the radius turn
+  //go for a 180 degree angle turn every time, with radius being the straight line distance??
+  //idea
+}
 
 
 void SFDrive::PIDTuning(float delta) {
@@ -294,6 +313,7 @@ void SFDrive::stopAutoThread()
    stopThread = true;
    joinAutoThread();
    stopThread = false;
+   //do we just delete thread??
 }
 
 void SFDrive::joinAutoThread()

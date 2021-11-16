@@ -46,5 +46,6 @@ class SFDrive {
   void setD(double value);
   void joinAutoThread();
   void stopAutoThread();
+  bool OptimizedMovement(float currx, float curry, float endx, float endy);
 
 };

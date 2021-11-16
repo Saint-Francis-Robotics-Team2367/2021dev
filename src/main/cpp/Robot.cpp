@@ -63,58 +63,59 @@ void Robot::AutonomousInit()
 }
 
 void Robot::AutonomousPeriodic() {
-  double radius = 3;
-  double angle = 60;
-  double endpoint = (angle / 360.0) * (radius + centerToWheel) * (2 * 3.1415);
-  frc::SmartDashboard::PutNumber("endpoint", endpoint);
-  //double innerChord = ((angle * (radius - centerToWheel))/360.0) * (2 * 3.1415); [don't matter, just use ratio instead]
+//   double radius = 3;
+//   double angle = 60;
+//   double endpoint = (angle / 360.0) * (radius + centerToWheel) * (2 * 3.1415);
+//   frc::SmartDashboard::PutNumber("endpoint", endpoint);
+//   //double innerChord = ((angle * (radius - centerToWheel))/360.0) * (2 * 3.1415); [don't matter, just use ratio instead]
 
 
-//never use while loops unless threading
-  if(currentPosition < endpoint){
-    timeElapsed = frc::Timer::GetFPGATimestamp() - prevTime;
-    distanceToDeccelerate = (3 * currentVelocity * currentVelocity) / (2 * maxAcc);
-    if (distanceToDeccelerate > endpoint - currentPosition) {
-      currentVelocity -= (maxAcc * timeElapsed);
-    }
-    else //increase velocity
-    {
-      currentVelocity += (maxAcc * timeElapsed);
-      if (currentVelocity > maxVelocity)
-      {
-        currentVelocity = maxVelocity;
-      }
-    }
+// //never use while loops unless threading
+//   if(currentPosition < endpoint){
+//     timeElapsed = frc::Timer::GetFPGATimestamp() - prevTime;
+//     distanceToDeccelerate = (3 * currentVelocity * currentVelocity) / (2 * maxAcc);
+//     if (distanceToDeccelerate > endpoint - currentPosition) {
+//       currentVelocity -= (maxAcc * timeElapsed);
+//     }
+//     else //increase velocity
+//     {
+//       currentVelocity += (maxAcc * timeElapsed);
+//       if (currentVelocity > maxVelocity)
+//       {
+//         currentVelocity = maxVelocity;
+//       }
+//     }
 
-    currentPosition += currentVelocity * timeElapsed;
-    if(currentPosition > endpoint) {
-      currentPosition = endpoint;
-    }
-    //same as other
+//     currentPosition += currentVelocity * timeElapsed;
+//     if(currentPosition > endpoint) {
+//       currentPosition = endpoint;
+//     }
+//     //same as other
    
-    double outerSetpoint = (currentPosition * 12) / (3.1415 * 5.7); // for now this is ticks (maybe rotations / gearRatio if not then)
-    double innerSetpoint = ((radius - centerToWheel)/(radius + centerToWheel)) * outerSetpoint;
+//     double outerSetpoint = (currentPosition * 12) / (3.1415 * 5.7); // for now this is ticks (maybe rotations / gearRatio if not then)
+//     double innerSetpoint = ((radius - centerToWheel)/(radius + centerToWheel)) * outerSetpoint;
     
-    frc::SmartDashboard::PutNumber("outerSet", outerSetpoint);
-    frc::SmartDashboard::PutNumber("innerSet", innerSetpoint);
-    //rotations and keep the multiply 
-    //probably multiplying by gear ratio twice
-    //ask abt while loops!
-    if(currentPosition < endpoint){
-      m_leftLeadMotor->GetPIDController().SetReference(-outerSetpoint, rev::ControlType::kPosition);
-      m_rightLeadMotor->GetPIDController().SetReference(innerSetpoint, rev::ControlType::kPosition);
-    }
-     //what goes here
-    prevTime = frc::Timer::GetFPGATimestamp();
+//     frc::SmartDashboard::PutNumber("outerSet", outerSetpoint);
+//     frc::SmartDashboard::PutNumber("innerSet", innerSetpoint);
+//     //rotations and keep the multiply 
+//     //probably multiplying by gear ratio twice
+//     //ask abt while loops!
+//     if(currentPosition < endpoint){
+//       m_leftLeadMotor->GetPIDController().SetReference(-outerSetpoint, rev::ControlType::kPosition);
+//       m_rightLeadMotor->GetPIDController().SetReference(innerSetpoint, rev::ControlType::kPosition);
+//     }
+//      //what goes here
+//     prevTime = frc::Timer::GetFPGATimestamp();
   
-}
+// }
 
-/**if(testBool) {
+if(testBool) {
   testBool = false;
-  m_leftLeadMotor->GetPIDController().SetReference(12.0 / (3.145 * 5.7), rev::ControlType::kPosition);
-  m_rightLeadMotor->GetPIDController().SetReference(-12.0 / (3.145 * 5.7), rev::ControlType::kPosition);
-  frc::SmartDashboard::PutNumber("conversion", -12.0 / (3.145 * 5.7));
-} **/
+  if(m_robotDrive->PIDDriveThread(1.0, 7.0, 21.0)) {
+    //is this right? or like what's poppin droppin with their old implementation
+    m_robotDrive->joinAutoThread();
+  }
+} 
 }
 
 void Robot::TeleopInit() {
@@ -130,7 +131,7 @@ void Robot::TeleopPeriodic()
 }
 
 void Robot::DisabledInit() {
-  m_robotDrive->stopAutoThread(); //yeah
+  m_robotDrive->stopAutoThread(); //yeah, idk if this works, memory leaks?
 }
 
 void Robot::DisabledPeriodic() {}
