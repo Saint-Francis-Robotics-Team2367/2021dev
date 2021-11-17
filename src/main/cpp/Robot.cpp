@@ -33,6 +33,7 @@ void Robot::RobotInit() {
 void Robot::RobotPeriodic() {
   frc::SmartDashboard::PutNumber("left y: ", -(m_stick->GetRawAxis(1)));
   frc::SmartDashboard::PutNumber("right x: ", m_stick->GetRawAxis(4));
+  frc::SmartDashboard::PutNumber("current", m_leftLeadMotor->GetOutputCurrent());
 }
  
 void Robot::AutonomousInit() {}
