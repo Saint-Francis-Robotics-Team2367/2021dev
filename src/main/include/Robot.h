@@ -90,7 +90,6 @@ class Robot : public frc::TimedRobot {
 
 void Robot::checkMotorIDs(){
   int count = 0;
-  bool testedMotors = false;
   const int maxNumIDs = 16;
   std::string workingMotorIDString = "Working Motor IDs: ";
   std::list<int> motorList;
@@ -101,45 +100,45 @@ void Robot::checkMotorIDs(){
       std::cout << "TestInit: Motor ID: " << i << std::endl;      
     } 
 
-    if (testedMotors == false) {
-      for (currentID = motorList.begin(); currentID != motorList.end(); currentID++) {
-        std::cout << "TestPeriodic: Testing Motor ID: " << *currentID << std::endl;
+    for (currentID = motorList.begin(); currentID != motorList.end(); currentID++) {
+      std::cout << "TestPeriodic: Testing Motor ID: " << *currentID << std::endl;
+  
+      rev::CANSparkMax* motor = new rev::CANSparkMax(*currentID, rev::CANSparkMax::MotorType::kBrushless);
+
+      motor->Set(0.5);
     
-        rev::CANSparkMax* motor = new rev::CANSparkMax(*currentID, rev::CANSparkMax::MotorType::kBrushless);
-
-        motor->Set(0.5);
-      
-        // for some reason GetFault() is needed for GetLastError() to catch the error - need to investigate
-        motor->GetFault(rev::CANSparkMax::FaultID::kMotorFault);
-    
-        if ((motor->GetLastError() == rev::CANError::kHALError)){
-          std::cout << "Deleting motor with motor ID of " << *currentID << std::endl; 
-          currentID = motorList.erase(currentID);
-          currentID--;
-          
-        } else {
-          std::cout << "Working motor ID " << *currentID << " is kept in list" << std::endl;
-          motor->Set(0);
-        }
-
-        delete motor;
-      
-      }
-      std::cout << "Done iterating through queue" << std::endl;
-      
-      testedMotors = true;    
-
-    } else {
-      std::cout << "Working motor ID ";
-
-      for (auto &j : motorList) {
-      std::cout << j << " ";
-      workingMotorIDString += j + " ";
+      // for some reason GetFault() is needed for GetLastError() to catch the error - need to investigate
+      motor->GetFault(rev::CANSparkMax::FaultID::kMotorFault);
+  
+      if ((motor->GetLastError() == rev::CANError::kHALError)){
+        std::cout << "Deleting motor with motor ID of " << *currentID << std::endl; 
+        currentID = motorList.erase(currentID);
+        currentID--;
+        
+      } else {
+        std::cout << "Working motor ID " << *currentID << " is kept in list" << std::endl;
+        motor->Set(0);
       }
 
-      frc::DriverStation::ReportError(workingMotorIDString);
-      std::cout << std::endl;
-      
-      std::cout << "Done printing working motorID list" << std::endl;
+      delete motor;
+    
     }
+    std::cout << "Done iterating through list" << std::endl;
+    
+    std::cout << "Working motor ID ";
+
+    for (auto &j : motorList) {
+    std::cout << j << " ";
+    workingMotorIDString.append(std::to_string(j) + " ");
+    }
+    std::cout << std::endl;
+    std::cout << workingMotorIDString << std::endl;
+    frc::DriverStation::ReportError(workingMotorIDString);
+    std::cout << std::endl;
+    
+    std::cout << "Done printing working motorID list" << std::endl;
+    std::cout << "Deleting list..." << std::endl;
+    motorList.~list<int>();
+
+    exit(0);
   }
