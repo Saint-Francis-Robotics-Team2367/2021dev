@@ -1,5 +1,5 @@
-# To plot the current output values on a graph in shuffleboard, choose the "current" numeric value and right-click in the heading and select “Show as…” and then choose graph.
-[Source](https://docs.wpilib.org/en/stable/docs/software/wpilib-tools/shuffleboard/getting-started/shuffleboard-graphs.html)
+To plot the current output values on a graph in shuffleboard, choose the "current" numeric value and right-click in the heading and select “Show as…” and then choose graph.
+[Source for working with graphs on Shuffleboard](https://docs.wpilib.org/en/stable/docs/software/wpilib-tools/shuffleboard/getting-started/shuffleboard-graphs.html)
 
 # 2021dev
 Learning wpilib
