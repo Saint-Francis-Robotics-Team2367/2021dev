@@ -77,10 +77,24 @@ void Robot::TeleopPeriodic() {
 void Robot::DisabledInit() {}
 void Robot::DisabledPeriodic() {}
 
-void Robot::TestInit() {}
+void Robot::TestInit() {
+  std::cout << "TestInit: Entering init" << std::endl;
+  tested_motors = false;
+  // Robot::checkMotorIDs();
+  std::cout << "TestInit: Exiting function" << std::endl;
+}
 
 void Robot::TestPeriodic() {
-  Robot::checkMotorIDs();
+  std::cout << "TestPeriodic: Entering periodic" << std::endl;
+  if (tested_motors == false) {
+    std::cout << "-------------ENTERING FUNCTION------------" << std::endl;
+    Robot::checkMotorIDs();
+    std::cout << "-------------EXITING FUNCTION------------" << std::endl;
+    tested_motors = true;
+  } else {
+    std::cout << "-------------EXITING CODE------------" << std::endl;
+    exit(0);
+  }
 }
 
 #ifndef RUNNING_FRC_TESTS
