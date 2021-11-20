@@ -5,6 +5,8 @@
 #include "Robot.h"
 #include <frc/smartdashboard/SmartDashboard.h>
 
+// roboRIO-TEAM-frc.local
+
 void Robot::RobotInit() {
   // Restore factory defaults on drive motors
   m_leftLeadMotor->RestoreFactoryDefaults();
@@ -29,7 +31,9 @@ void Robot::RobotInit() {
   m_leftFollowMotor->Follow(*m_leftLeadMotor, false);
   m_rightLeadMotor->SetInverted(false);
   m_rightFollowMotor->Follow(*m_rightLeadMotor, false);
+
 }
+
 void Robot::RobotPeriodic() {
   frc::SmartDashboard::PutNumber("left y: ", -(m_stick->GetRawAxis(1)));
   frc::SmartDashboard::PutNumber("right x: ", m_stick->GetRawAxis(4));
@@ -40,12 +44,14 @@ void Robot::AutonomousInit() {}
 void Robot::AutonomousPeriodic() {}
 
 void Robot::TeleopInit() {
+  frc::Solenoid valve{0};
   m_leftEncoder.SetPosition(0);
   m_rightEncoder.SetPosition(0);
   compressor = new frc::Spark(1);
   pressed_button_pressure = true;
   valve.Set(false);
 }
+
 void Robot::TeleopPeriodic() {
   left_y = m_stick->GetRawAxis(1);
   right_x = m_stick->GetRawAxis(4);
@@ -63,7 +69,7 @@ void Robot::TeleopPeriodic() {
 
   PSI = (analog_input->GetVoltage()) * 100 + 10; // transfer function
   if (m_stick->GetRawButtonPressed(1)) {
-    valve.Set(false);
+    // valve.Set(false);
     pressed_button_pressure = true;
     reached_max_pressure = false;
     frc::SmartDashboard::PutBoolean("triggerpress", true);
@@ -71,21 +77,21 @@ void Robot::TeleopPeriodic() {
   }
 
   if ((m_stick->GetRawButtonPressed(2)) && (reached_max_pressure)) {
-    valve.Set(true);
+    // valve.Set(true);
     frc::SmartDashboard::PutBoolean("valve", true);
   }
 
   if (m_stick->GetRawButtonPressed(3)) {
-    valve.Set(false);
+    // valve.Set(false);
     frc::SmartDashboard::PutBoolean("valve", false);
   }
 
   if ((!reached_max_pressure) && (pressed_button_pressure)) {
     if (PSI < maxPSI) {
       frc::SmartDashboard::PutNumber("currPSI", PSI);
-      compressor->Set(1);
+      // compressor->Set(1);
     } else {
-      compressor->Set(0);
+      // compressor->Set(0);
       reached_max_pressure = true;
       pressed_button_pressure = false; 
       frc::SmartDashboard::PutBoolean("triggerpress", false);
@@ -99,8 +105,18 @@ void Robot::TeleopPeriodic() {
 void Robot::DisabledInit() {}
 void Robot::DisabledPeriodic() {}
 
-void Robot::TestInit() {}
-void Robot::TestPeriodic() {}
+void Robot::TestInit() {
+  tested_motors = false;
+}
+
+void Robot::TestPeriodic() {
+  if (tested_motors == false) {
+    TestFunctions->checkMotorIDs();
+    tested_motors = true;
+  } else {
+    exit(0);
+  }
+}
 
 #ifndef RUNNING_FRC_TESTS
 int main() {
