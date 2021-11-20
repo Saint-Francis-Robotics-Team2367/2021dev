@@ -49,19 +49,6 @@ class Robot : public frc::TimedRobot {
 
   int driveMotorCurrentLimit = 30;
 
-  float speed_leftLead;
-  float speed_leftFollow;
-  float speed_rightLead;
-  float speed_rightFollow;
-
-  float left_inputSpeed;
-  float right_inputSpeed;
-
-  bool leftMotor_equal;
-  bool rightMotor_equal;
-
-  bool tested_motors = false;
-
   frc::AnalogInput * analog_input = new frc::AnalogInput(1);
 
   frc::Spark *compressor;
