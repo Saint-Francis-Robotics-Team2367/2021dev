@@ -47,6 +47,8 @@ class Robot : public frc::TimedRobot {
   bool reached_max_pressure = false;
   bool pressed_button_pressure = true;
 
+  bool tested_motors;
+
   int driveMotorCurrentLimit = 30;
 
   frc::AnalogInput * analog_input = new frc::AnalogInput(1);
