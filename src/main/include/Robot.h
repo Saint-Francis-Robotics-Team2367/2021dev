@@ -10,7 +10,12 @@
 #include <frc/Spark.h>
 #include "SFDrive.h"
 #include <frc/Solenoid.h>
-
+#include <frc/commands/WaitCommand.h>
+#include <unistd.h>
+#include <iostream>
+#include <fstream>
+#include <stdio.h>
+#include "Test.h"
 class Robot : public frc::TimedRobot {
  public:
   void RobotInit() override;
@@ -28,10 +33,10 @@ class Robot : public frc::TimedRobot {
   void TestInit() override;
   void TestPeriodic() override;
 
-  static const int leftLeadDeviceID = 12; // 12
-  static const int leftFollowDeviceID = 13;
-  static const int rightLeadDeviceID = 15; // 15
-  static const int rightFollowDeviceID = 14;
+  static const int leftLeadDeviceID = 12; // 15 for 2367 // 3 for 8109
+  static const int leftFollowDeviceID = 13; // 14
+  static const int rightLeadDeviceID = 13; // 12 // 12 for 8109
+  static const int rightFollowDeviceID = 14; // 13
 
   double left_y = 0.0;
   double right_x = 0.0;
@@ -41,6 +46,8 @@ class Robot : public frc::TimedRobot {
   float var_input;
   bool reached_max_pressure = false;
   bool pressed_button_pressure = true;
+
+  bool tested_motors;
 
   int driveMotorCurrentLimit = 30;
 
@@ -62,4 +69,6 @@ class Robot : public frc::TimedRobot {
 
   frc::Solenoid valve{0};
 
+  Test* TestFunctions = new Test();
+  
 };
