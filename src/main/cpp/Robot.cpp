@@ -9,35 +9,35 @@
 
 void Robot::RobotInit() {
   // Restore factory defaults on drive motors
-  m_leftLeadMotor->RestoreFactoryDefaults();
+  // m_leftLeadMotor->RestoreFactoryDefaults();
   m_rightLeadMotor->RestoreFactoryDefaults();
-  m_leftFollowMotor->RestoreFactoryDefaults();
-  m_rightFollowMotor->RestoreFactoryDefaults();
+  // m_leftFollowMotor->RestoreFactoryDefaults();
+  // m_rightFollowMotor->RestoreFactoryDefaults();
 
   // Set current limit for drive motors
-  m_leftLeadMotor->SetSmartCurrentLimit(driveMotorCurrentLimit);
+  // m_leftLeadMotor->SetSmartCurrentLimit(driveMotorCurrentLimit);
   m_rightLeadMotor->SetSmartCurrentLimit(driveMotorCurrentLimit);
-  m_leftFollowMotor->SetSmartCurrentLimit(driveMotorCurrentLimit);
-  m_rightLeadMotor->SetSmartCurrentLimit(driveMotorCurrentLimit);
+  // m_leftFollowMotor->SetSmartCurrentLimit(driveMotorCurrentLimit);
+  // m_rightLeadMotor->SetSmartCurrentLimit(driveMotorCurrentLimit);
 
   // Set drive motors to brake mode
-  m_leftLeadMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
+  // m_leftLeadMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
   m_rightLeadMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
-  m_leftFollowMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
-  m_rightFollowMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
+  // m_leftFollowMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
+  // m_rightFollowMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
 
   // Set followers and inverts for drive motors
-  m_leftLeadMotor->SetInverted(true);
-  m_leftFollowMotor->Follow(*m_leftLeadMotor, false);
+  // m_leftLeadMotor->SetInverted(true);
+  // m_leftFollowMotor->Follow(*m_leftLeadMotor, false);
   m_rightLeadMotor->SetInverted(false);
-  m_rightFollowMotor->Follow(*m_rightLeadMotor, false);
+  // m_rightFollowMotor->Follow(*m_rightLeadMotor, false);
 
 }
 
 void Robot::RobotPeriodic() {
   frc::SmartDashboard::PutNumber("left y: ", -(m_stick->GetRawAxis(1)));
   frc::SmartDashboard::PutNumber("right x: ", m_stick->GetRawAxis(4));
-  frc::SmartDashboard::PutNumber("current", m_leftLeadMotor->GetOutputCurrent());
+  // frc::SmartDashboard::PutNumber("current", m_leftLeadMotor->GetOutputCurrent());
 }
  
 void Robot::AutonomousInit() {}
@@ -45,7 +45,7 @@ void Robot::AutonomousPeriodic() {}
 
 void Robot::TeleopInit() {
   frc::Solenoid valve{0};
-  m_leftEncoder.SetPosition(0);
+  // m_leftEncoder.SetPosition(0);
   m_rightEncoder.SetPosition(0);
   compressor = new frc::Spark(1);
   pressed_button_pressure = false;
@@ -58,7 +58,7 @@ void Robot::TeleopPeriodic() {
   left_y = m_stick->GetRawAxis(1);
   right_x = m_stick->GetRawAxis(4);
 
-  m_robotDrive->ArcadeDrive(-left_y, right_x);
+  // m_robotDrive->ArcadeDrive(-left_y, right_x);
 
   // analog_input->GetVoltage();
   // frc::SmartDashboard::PutNumber("analogInput", analog_input->GetVoltage());
@@ -101,6 +101,17 @@ void Robot::TeleopPeriodic() {
   // }
   
   // button A -  manual up
+  
+  // testing one limit switch
+  if (bottomLimitSwitch.Get()) {
+    std::cout << "limit switch is on!" << std::endl;
+    frc::SmartDashboard::PutBoolean("limitSwitch", true);
+  } else {
+    std::cout << "limit switch is off!" << std::endl;
+    frc::SmartDashboard::PutBoolean("limitSwtich", false);
+  }
+
+  /*
   if (m_stick->GetRawButton(0)) {
     upFlag = true;
     downFlag = false;
@@ -160,7 +171,7 @@ void Robot::TeleopPeriodic() {
     }
   }
 
-
+*/
   // if (upFlag && maxFlag && (topLimitSwitch.Get() == false)) {
   //   m_elevator->Set(1.0);
   // } else if (upFlag) {
