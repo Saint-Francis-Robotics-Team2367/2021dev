@@ -44,12 +44,12 @@ void Robot::AutonomousInit() {}
 void Robot::AutonomousPeriodic() {}
 
 void Robot::TeleopInit() {
-  frc::Solenoid valve{0};
+  // frc::Solenoid valve{0};
   m_leftEncoder.SetPosition(0);
   m_rightEncoder.SetPosition(0);
-  compressor = new frc::Spark(1);
+  // compressor = new frc::Spark(1);
   pressed_button_pressure = false;
-  valve.Set(false);
+  // valve.Set(false);
 }
 
 void Robot::TeleopPeriodic() {
@@ -58,7 +58,7 @@ void Robot::TeleopPeriodic() {
 
   m_robotDrive->ArcadeDrive(-left_y, right_x);
 
-  analog_input->GetVoltage();
+  // analog_input->GetVoltage();
   frc::SmartDashboard::PutNumber("analogInput", analog_input->GetVoltage());
 
   var_input = frc::SmartDashboard::GetNumber("varInput", 1);
