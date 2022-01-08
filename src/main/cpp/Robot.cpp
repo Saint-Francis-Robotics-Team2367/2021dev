@@ -48,7 +48,7 @@ void Robot::TeleopInit() {
   m_leftEncoder.SetPosition(0);
   m_rightEncoder.SetPosition(0);
   compressor = new frc::Spark(1);
-  pressed_button_pressure = true;
+  pressed_button_pressure = false;
   valve.Set(false);
 }
 
