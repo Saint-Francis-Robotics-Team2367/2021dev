@@ -58,7 +58,7 @@ void SFDrive::ArcadeDrive(double joystickX, double joystickY) {
   }
 
 
-  leftLeadMotor->Set(-leftMotorOutput);
+  leftLeadMotor->Set(leftMotorOutput);
   //negate here
   rightLeadMotor->Set(rightMotorOutput);
 }
@@ -106,7 +106,7 @@ bool SFDrive::PIDDrive(float totalFeet, float maxAcc, float maxVelocity) {
     //converting currentPosition to ticks? for the motor: inches / (circum) * ticks * gearboxRatio, might look at this later
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     setpoint = (currentPosition * 12) / (PI * 5.7) * 42 * (0.168); // for now this is ticks (maybe rotations / gearRatio if not then)
-    leftLeadMotor->GetPIDController().SetReference(-setpoint, rev::ControlType::kPosition);
+    leftLeadMotor->GetPIDController().SetReference(setpoint, rev::ControlType::kPosition);
     rightLeadMotor->GetPIDController().SetReference(setpoint, rev::ControlType::kPosition);
     prevTime = frc::Timer::GetFPGATimestamp();
     graph(currentVelocity, currentPosition, timeElapsed, setpoint);
@@ -156,7 +156,7 @@ bool SFDrive::PIDTurn(float angle, float radius, float maxAcc, float maxVelocity
     frc::SmartDashboard::PutNumber("innerSet", innerSetpoint);
 
     if(currentPosition < endpoint){
-      leftLeadMotor->GetPIDController().SetReference(-outerSetpoint, rev::ControlType::kPosition);
+      leftLeadMotor->GetPIDController().SetReference(outerSetpoint, rev::ControlType::kPosition);
       rightLeadMotor->GetPIDController().SetReference(innerSetpoint, rev::ControlType::kPosition);
     }
     prevTime = frc::Timer::GetFPGATimestamp();
