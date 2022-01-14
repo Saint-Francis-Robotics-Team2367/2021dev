@@ -39,12 +39,8 @@ class Robot : public frc::TimedRobot {
   const double maxVelocity = 21;
   const double maxAcc = 7;
   double delta = 1;
-  //setpoint (in feet for now)
-  double positionTotal = 6;
-  //currpos
+  double testBool = true;
   double currentPosition;
-  bool testBool = true;
-  bool whichOne = true;
   double timeElapsed = 0;
   double centerToWheel = 1.23; //in feet
 
@@ -60,8 +56,6 @@ class Robot : public frc::TimedRobot {
   void DisabledPeriodic() override;
   void TestInit() override;
   void TestPeriodic() override;
-  void PIDValueDrawing();
-  double convertDistanceToTicks(double);
   void PIDTesting();
 
  private:
@@ -71,17 +65,61 @@ class Robot : public frc::TimedRobot {
   std::string m_autoSelected;
 };
 
-//actually revolutions
-double Robot::convertDistanceToTicks(double feet) {
-  //inches / (3.14 * 5.7) * 42 * ((14/50) * (24/40))
-  double inches = feet * 12;
-  double diameter = 5.7;
-  double ticksPerRevolution = 42;
-  double wheelCircumference = 3.14*diameter;
-  double gearRatio = 0.168;
-  // return inches*wheelCircumference/(14/50*(24/40));
-  // multiply or divide by gear ratio?
-  return inches/wheelCircumference * ticksPerRevolution * gearRatio;
+void Robot::PIDTesting() {
+  //frc::SmartDashboard::PutNumber("delta", delta);
+  double currentLeftLead = m_leftLeadMotor->GetOutputCurrent();
+  double currentRightLead = m_rightLeadMotor->GetOutputCurrent();
+  frc::SmartDashboard::PutNumber("Total Current", currentLeftLead+currentRightLead);
+
+  //Making it so you can manually set m_p and positionTotal: m_p is essential with PID, change by an order of magnitude to start run
+  double m_P = frc::SmartDashboard::GetNumber("Pd", 0.30);
+  //bool isNegative;
+  m_leftLeadMotor->GetPIDController().SetP(m_P);
+  m_rightLeadMotor->GetPIDController().SetP(m_P);
+  frc::SmartDashboard::PutNumber("Pd", m_P);
+
+  double m_D = frc::SmartDashboard::GetNumber("D Value", 0.0);
+  //bool isNegative;
+  m_leftLeadMotor->GetPIDController().SetD(m_D);
+  m_rightLeadMotor->GetPIDController().SetD(m_D);
+  frc::SmartDashboard::PutNumber("D Value", m_D);
+
+  double m_I = frc::SmartDashboard::GetNumber("I Value", 0.0);
+  //bool isNegative;
+  m_leftLeadMotor->GetPIDController().SetI(m_I);
+  m_rightLeadMotor->GetPIDController().SetI(m_I);
+  frc::SmartDashboard::PutNumber("I Value", m_I);
+
+ double I_Zone = frc::SmartDashboard::GetNumber("I_Zone", 0.0);
+  //bool isNegative;
+  m_leftLeadMotor->GetPIDController().SetIZone(I_Zone);
+  m_rightLeadMotor->GetPIDController().SetIZone(I_Zone);
+  frc::SmartDashboard::PutNumber("I_Zone", I_Zone);
+
+  m_leftLeadMotor->GetPIDController().SetIZone(I_Zone);
+
+  double waitTime = frc::SmartDashboard::GetNumber("waitTime", 4);
+  frc::SmartDashboard::PutNumber("waitTime", waitTime);
+  //frc::SmartDashboard::PutNumber("waitTime", waitTime);
+  // positionTotal = frc::SmartDashboard::GetNumber("positionTotal", 6);
+  // frc::SmartDashboard::PutNumber("positionTotal", positionTotal);
+  // positionTotal = -6;
+ 
+  double currTime = frc::Timer::GetFPGATimestamp();
+  frc::SmartDashboard::PutNumber("currTime", currTime);
+  frc::SmartDashboard::PutNumber("Setpoint", delta);
+  if(currTime > prevTime + waitTime) {
+      m_leftLeadMotor->GetPIDController().SetReference(delta, rev::ControlType::kPosition);
+      m_rightLeadMotor->GetPIDController().SetReference(delta, rev::ControlType::kPosition);
+      delta = delta * -1.0;
+ 
+      frc::SmartDashboard::PutNumber("Right Encoder", m_rightEncoder.GetPosition());
+      frc::SmartDashboard::PutNumber("Left Encoder", m_leftEncoder.GetPosition());
+      //frc::SmartDashboard::PutNumber("Motor Current", m_leftLeadMotor->GetOutputCurrent());
+
+      prevTime = frc::Timer::GetFPGATimestamp();
+      frc::SmartDashboard::PutNumber("prevTime", prevTime);
+  }
 }
 
 

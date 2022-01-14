@@ -109,7 +109,6 @@ bool SFDrive::PIDDrive(float totalFeet, float maxAcc, float maxVelocity) {
     leftLeadMotor->GetPIDController().SetReference(setpoint, rev::ControlType::kPosition);
     rightLeadMotor->GetPIDController().SetReference(setpoint, rev::ControlType::kPosition);
     prevTime = frc::Timer::GetFPGATimestamp();
-    graph(currentVelocity, currentPosition, timeElapsed, setpoint);
   }
   return true;
 }
@@ -211,8 +210,8 @@ void SFDrive::PIDTuning(float delta) {
   frc::SmartDashboard::PutNumber("Setpoint", delta);
   if(currTime > prevTime + waitTime) {
       leftLeadMotor->GetPIDController().SetReference(delta, rev::ControlType::kPosition);
-      delta = delta * -1.0;
       rightLeadMotor->GetPIDController().SetReference(delta, rev::ControlType::kPosition);
+      delta = delta * -1.0;
  
       frc::SmartDashboard::PutNumber("Right Encoder", m_rightEncoder.GetPosition());
       frc::SmartDashboard::PutNumber("Left Encoder", m_leftEncoder.GetPosition());

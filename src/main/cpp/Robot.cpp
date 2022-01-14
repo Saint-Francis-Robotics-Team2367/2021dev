@@ -7,66 +7,7 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <math.h>
 
-void Robot::PIDTesting() {
-  //frc::SmartDashboard::PutNumber("delta", delta);
-  double currentLeftLead = m_leftLeadMotor->GetOutputCurrent();
-  double currentRightLead = m_rightLeadMotor->GetOutputCurrent();
-  frc::SmartDashboard::PutNumber("Total Current", currentLeftLead+currentRightLead);
 
-  //Making it so you can manually set m_p and positionTotal: m_p is essential with PID, change by an order of magnitude to start run
-  double m_P = frc::SmartDashboard::GetNumber("Pd", 0.30);
-  //bool isNegative;
-  m_leftLeadMotor->GetPIDController().SetP(m_P);
-  m_rightLeadMotor->GetPIDController().SetP(m_P);
-  frc::SmartDashboard::PutNumber("Pd", m_P);
-
-  double m_D = frc::SmartDashboard::GetNumber("D Value", 0.0);
-  //bool isNegative;
-  m_leftLeadMotor->GetPIDController().SetD(m_D);
-  m_rightLeadMotor->GetPIDController().SetD(m_D);
-  frc::SmartDashboard::PutNumber("D Value", m_D);
-
-  double m_I = frc::SmartDashboard::GetNumber("I Value", 0.0);
-  //bool isNegative;
-  m_leftLeadMotor->GetPIDController().SetI(m_I);
-  m_rightLeadMotor->GetPIDController().SetI(m_I);
-  frc::SmartDashboard::PutNumber("I Value", m_I);
-
- double I_Zone = frc::SmartDashboard::GetNumber("I_Zone", 0.0);
-  //bool isNegative;
-  m_leftLeadMotor->GetPIDController().SetIZone(I_Zone);
-  m_rightLeadMotor->GetPIDController().SetIZone(I_Zone);
-  frc::SmartDashboard::PutNumber("I_Zone", I_Zone);
-
-  m_leftLeadMotor->GetPIDController().SetIZone(I_Zone);
-
-  double waitTime = frc::SmartDashboard::GetNumber("waitTime", 4);
-  frc::SmartDashboard::PutNumber("waitTime", waitTime);
-  //frc::SmartDashboard::PutNumber("waitTime", waitTime);
-  // positionTotal = frc::SmartDashboard::GetNumber("positionTotal", 6);
-  // frc::SmartDashboard::PutNumber("positionTotal", positionTotal);
-  // positionTotal = -6;
- 
-  double currTime = frc::Timer::GetFPGATimestamp();
-  frc::SmartDashboard::PutNumber("currTime", currTime);
-  frc::SmartDashboard::PutNumber("Setpoint", delta);
-  if(currTime > prevTime + waitTime) {
-      m_leftLeadMotor->GetPIDController().SetReference(delta, rev::ControlType::kPosition);
-      m_rightLeadMotor->GetPIDController().SetReference(delta, rev::ControlType::kPosition);
-      delta = delta * -1.0;
- 
-      frc::SmartDashboard::PutNumber("Right Encoder", m_rightEncoder.GetPosition());
-      frc::SmartDashboard::PutNumber("Left Encoder", m_leftEncoder.GetPosition());
-      //frc::SmartDashboard::PutNumber("Motor Current", m_leftLeadMotor->GetOutputCurrent());
-
-      prevTime = frc::Timer::GetFPGATimestamp();
-      frc::SmartDashboard::PutNumber("prevTime", prevTime);
-  }
-  //Testing for single graph
-  // frc::SmartDashboard::PutNumber("Single Graph", m_leftEncoder.GetPosition());
-  // frc::SmartDashboard::PutNumber("Single Graph", delta);
-  // frc::SmartDashboard::PutNumber("Single Graph", currentLeftLead+currentRightLead);
-}
 
 void Robot::RobotInit()
 {
@@ -139,8 +80,8 @@ void Robot::AutonomousInit()
 }
 
 void Robot::AutonomousPeriodic() {
-//   whichOne = frc::SmartDashboard::GetBoolean("whichOne", whichOne);
-//   testBool = frc::SmartDashboard::GetBoolean("boolean", testBool);
+    Robot::PIDTesting();
+
 //   double radius = 0;
 //   double angle = 360;
 //   double endpoint = (angle / 360.0) * (radius + centerToWheel) * (2 * 3.1415);
@@ -217,7 +158,7 @@ void Robot::AutonomousPeriodic() {
   //   prevTime = frc::Timer::GetFPGATimestamp();
      
 // }
-  Robot::PIDTesting();
+
 }
 
 
